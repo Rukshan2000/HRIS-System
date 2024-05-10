@@ -52,6 +52,11 @@ const Sidebar = ({ children }) => {
             name: "Add Employee",
             icon: <FaUserEdit />
         },
+        {
+            path: "/mydashboard",
+            name: "my dashboard",
+            icon: <FaUserEdit />
+        },
    
     ];
 
