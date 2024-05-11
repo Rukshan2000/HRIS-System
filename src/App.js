@@ -16,6 +16,11 @@ import SplashPage from './pages/SplashPage.jsx';
 import AddEmployee from './pages/AddEmployee.jsx';
 import SecureLayer from './pages/SecureLayer.jsx';
 import AdminProfile from './pages/AdminProfile.jsx';
+import TaskUser from './pages/TaskUser.jsx';
+import ProfileUser from './pages/ProfileUser.jsx';
+import PayRollUser from './pages/PayRollUser.jsx';
+import LeaveUser from './pages/LeaveUser.jsx';
+
 
 
 
@@ -29,7 +34,6 @@ const App = () => {
         <Route path="/addemployee" element={<Sidebar><AddEmployee /></Sidebar>} />
         <Route path="/splashpage" element={<SplashPage />} />
         <Route path="/dashboard/*" element={<Sidebar><Dashboard /></Sidebar>} /> {/* Protected route for Dashboard */}
-        <Route path="/mydashboard" element={<MyDashboard />} /> {/* Render MyDashboard component without Sidebar */}
         <Route path="/payroll" element={<Sidebar><Payroll /></Sidebar>} />
         <Route path="/leave" element={<Sidebar><Leave /></Sidebar>} />
         <Route path="/employee" element={<Sidebar><Employee /></Sidebar>} />
@@ -38,6 +42,13 @@ const App = () => {
         <Route path="/signup" element={<Sidebar><Signup /></Sidebar>} />
         <Route path="/securelayer" element={<Sidebar><SecureLayer /></Sidebar>} />
         <Route path="/adminprofile" element={<Sidebar><AdminProfile /></Sidebar>} />
+        <Route path="/mydashboard" element={<MyDashboard />} /> 
+        <Route path="/leaveuser" element={<LeaveUser />} /> 
+        <Route path="/payrolluser" element={<PayRollUser />} /> 
+        <Route path="/profileuser" element={<ProfileUser />} /> 
+        <Route path="/taskuser" element={<TaskUser />} /> 
+
+
 
 
       </Routes>

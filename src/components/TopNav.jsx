@@ -50,22 +50,22 @@ const TopNav = () => {
           </button>
         </li>
         <li className="mx-4 my-6 md:my-0">
-          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/emptask")}>
+          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/taskuser")}>
             Task
           </button>
         </li>
         <li className="mx-4 my-6 md:my-0">
-          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/emppayroll")}>
+          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/payrolluser")}>
             Payroll
           </button>
         </li>
         <li className="mx-4 my-6 md:my-0">
-          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/empleave")}>
+          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/leaveuser")}>
             Leave
           </button>
         </li>
         <li className="mx-4 my-6 md:my-0">
-          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/empprofile")}>
+          <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/profileuser")}>
             Profile
           </button>
         </li>

@@ -8,6 +8,7 @@ import {
     FaShoppingBag,
     FaThList,
     FaUserEdit,
+    FaFile,
     FaSignOutAlt // Add sign-out icon
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
@@ -54,8 +55,8 @@ const Sidebar = ({ children }) => {
         },
         {
             path: "/mydashboard",
-            name: "my dashboard",
-            icon: <FaUserEdit />
+            name: "My dashboard",
+            icon: <FaFile />
         },
    
     ];
