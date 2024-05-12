@@ -49,8 +49,8 @@ const Sidebar = ({ children }) => {
             icon: <FaThList />
         },
         {
-            path: "/securelayer",
-            name: "Add Employee",
+            path: "/employeeupdate",
+            name: "Manage Employee",
             icon: <FaUserEdit />
         },
         {

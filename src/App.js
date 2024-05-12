@@ -20,6 +20,8 @@ import TaskUser from './pages/TaskUser.jsx';
 import ProfileUser from './pages/ProfileUser.jsx';
 import PayRollUser from './pages/PayRollUser.jsx';
 import LeaveUser from './pages/LeaveUser.jsx';
+import EmployeeUpdate from './pages/EmployeeUpdate.jsx';
+import Announcement from './pages/Announcement.jsx';
 
 
 
@@ -42,6 +44,8 @@ const App = () => {
         <Route path="/signup" element={<Sidebar><Signup /></Sidebar>} />
         <Route path="/securelayer" element={<Sidebar><SecureLayer /></Sidebar>} />
         <Route path="/adminprofile" element={<Sidebar><AdminProfile /></Sidebar>} />
+        <Route path="/announcement" element={<Sidebar><Announcement /></Sidebar>} />
+        <Route path="/employeeupdate" element={<Sidebar><EmployeeUpdate /></Sidebar>} />
         <Route path="/mydashboard" element={<MyDashboard />} /> 
         <Route path="/leaveuser" element={<LeaveUser />} /> 
         <Route path="/payrolluser" element={<PayRollUser />} /> 

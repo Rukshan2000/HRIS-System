@@ -1,10 +1,10 @@
 import React from 'react';
-import Summary from '../components/Summary';
-import LeaveApprovedStatus from '../components/LeaveApprovedStatus ';
-import DailyAttendance from '../components/DailyAttendance';
-import { FaUser } from 'react-icons/fa'; // Import the user icon
+import { FaUser } from 'react-icons/fa'; // Import the FaUser icon
+import AddEmployee from '../components/AddEmployee';
+import UpdateUser from '../components/UpdateUser';
+import SubNav from '../components/SubNav';
 
-const Dashboard = () => {
+const AddEmployees = () => {
     // Function to handle profile icon click
     const handleProfileClick = () => {
         // Navigate to the admin profile page
@@ -14,7 +14,7 @@ const Dashboard = () => {
     return (
         <div>
             <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-gray-900 shadow-md">
-                <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+                <h1 className="text-3xl font-bold text-white">Employee Update</h1>
                 <div className="flex items-center">
                     {/* Profile icon with click event */}
                     <FaUser
@@ -24,10 +24,10 @@ const Dashboard = () => {
                     {/* Add your profile menu here */}
                 </div>
             </div>
-            <Summary />
-            <DailyAttendance />
+            <SubNav />
+            <UpdateUser />
         </div>
     );
 };
 
-export default Dashboard;
+export default AddEmployees;

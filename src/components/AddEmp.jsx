@@ -5,7 +5,7 @@ const Employee = () => {
         {
             id: 1,
             fullName: 'John Doe',
-            section: 'Section A',
+            department: 'Department A',
             designation: 'Manager',
             employmentStartDate: '2024-05-01',
             emergencyContactName: 'Jane Doe',
@@ -18,7 +18,7 @@ const Employee = () => {
     const [formData, setFormData] = useState({
         id: '',
         fullName: '',
-        section: '',
+        department: '',
         designation: '',
         employmentStartDate: '',
         emergencyContactName: '',
@@ -33,7 +33,7 @@ const Employee = () => {
     });
 
     const [filters, setFilters] = useState({
-        section: '',
+        department: '',
         designation: '',
     });
 
@@ -64,7 +64,7 @@ const Employee = () => {
         setFormData({
             id: '',
             fullName: '',
-            section: '',
+            department: '',
             designation: '',
             employmentStartDate: '',
             emergencyContactName: '',
@@ -92,9 +92,9 @@ const Employee = () => {
     };
 
     const filteredEmployees = employees.filter((emp) => {
-        const { section, designation } = filters;
+        const { department, designation } = filters;
         return (
-            emp.section.toLowerCase().includes(section.toLowerCase()) &&
+            emp.department.toLowerCase().includes(department.toLowerCase()) &&
             emp.designation.toLowerCase().includes(designation.toLowerCase())
         );
     });
@@ -105,10 +105,10 @@ const Employee = () => {
             <div className="mb-4">
                 <input
                     type="text"
-                    name="section"
-                    value={filters.section}
+                    name="department"
+                    value={filters.department}
                     onChange={handleFilterChange}
-                    placeholder="Filter by Section"
+                    placeholder="Filter by department"
                     className="px-3 py-2 mr-2 border border-gray-300 rounded-md"
                 />
                 <input
@@ -304,8 +304,8 @@ const Employee = () => {
                                 </label>
                                 <select
                                     id="departmentOrTeam"
-                                    name="section" // Assuming the department or team corresponds to the section
-                                    value={formData.section}
+                                    name="department" // Assuming the department or team corresponds to the department
+                                    value={formData.department}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required
@@ -353,7 +353,7 @@ const Employee = () => {
                         <tr className="bg-gray-200">
                             <th className="px-4 py-2 border border-gray-300">Emp ID</th>
                             <th className="px-4 py-2 border border-gray-300">Full Name</th>
-                            <th className="px-4 py-2 border border-gray-300">Section</th>
+                            <th className="px-4 py-2 border border-gray-300">department</th>
                             <th className="px-4 py-2 border border-gray-300">Designation</th>
                             <th className="px-4 py-2 border border-gray-300">Actions</th>
                         </tr>
@@ -363,7 +363,7 @@ const Employee = () => {
                             <tr key={emp.id}>
                                 <td className="px-4 py-2 border border-gray-300">{emp.id}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.fullName}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.section}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.department}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.designation}</td>
                                 <td className="px-4 py-2 border border-gray-300">
                                     <button onClick={() => handleEdit(emp.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">

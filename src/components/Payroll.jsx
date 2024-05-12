@@ -70,7 +70,6 @@ const Payroll = () => {
 
     return (
         <div className="container flex flex-col mx-auto">
-            <h1 className="mb-4 text-2xl font-bold">Payroll</h1>
             <div className="flex mb-4">
                 <input
                     type="text"

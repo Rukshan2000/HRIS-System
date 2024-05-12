@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 const Designation = () => {
     // Dummy data for designations
     const [designations, setDesignations] = useState([
-        { id: 1, section: 'Section A', designation: 'Manager', basicSalary: 5000 },
-        { id: 2, section: 'Section B', designation: 'Developer', basicSalary: 4000 },
+        { id: 1, department: 'Department A', designation: 'Manager', basicSalary: 5000 },
+        { id: 2, department: 'Department B', designation: 'Developer', basicSalary: 4000 },
         // Add more designations here
     ]);
 
     // Form data state
     const [formData, setFormData] = useState({
         id: '',
-        section: '',
+        department: '',
         designation: '',
         basicSalary: '',
         overtimePayRate: '',
@@ -25,7 +25,7 @@ const Designation = () => {
 
     // Filter state
     const [filters, setFilters] = useState({
-        section: '',
+        department: '',
         designation: ''
     });
 
@@ -59,7 +59,7 @@ const Designation = () => {
             setDesignations([...designations, { ...formData, id: Date.now() }]);
         }
         // Reset form data
-        setFormData({ id: '', section: '', designation: '', basicSalary: '', overtimePayRate: '', fuelAllowance: '', medicalAllowance: '', noPayLeaveDeductionRate: '', epfDeduction: '', welfareDeduction: '', taxDeduction: '' });
+        setFormData({ id: '', department: '', designation: '', basicSalary: '', overtimePayRate: '', fuelAllowance: '', medicalAllowance: '', noPayLeaveDeductionRate: '', epfDeduction: '', welfareDeduction: '', taxDeduction: '' });
         // Close the form
         setShowForm(false);
     };
@@ -79,23 +79,22 @@ const Designation = () => {
 
     // Function to filter designations based on filters
     const filteredDesignations = designations.filter((designation) => {
-        const { section, designation: desig } = filters;
+        const { department, designation: desig } = filters;
         return (
-            designation.section.toLowerCase().includes(section.toLowerCase()) &&
+            designation.department.toLowerCase().includes(department.toLowerCase()) &&
             designation.designation.toLowerCase().includes(desig.toLowerCase())
         );
     });
 
     return (
         <div className="container flex flex-col items-start mx-auto">
-            <h1 className="mb-4 text-2xl font-bold">Designations</h1>
             <div className="flex mb-4">
                 <input
                     type="text"
-                    name="section"
-                    value={filters.section}
+                    name="department"
+                    value={filters.department}
                     onChange={handleFilterChange}
-                    placeholder="Filter by Section"
+                    placeholder="Filter by Department"
                     className="px-3 py-2 mr-2 border border-gray-300 rounded-md"
                 />
                 <input
@@ -115,12 +114,12 @@ const Designation = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="section">Section:</label>
+                                    <label className="block mb-1 text-sm font-semibold" htmlFor="department">Department:</label>
                                     <input
                                         type="text"
-                                        id="section"
-                                        name="section"
-                                        value={formData.section}
+                                        id="department"
+                                        name="department"
+                                        value={formData.department}
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                         required
@@ -150,83 +149,7 @@ const Designation = () => {
                                         required
                                     />
                                 </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="overtimePayRate">Overtime Pay Rate:</label>
-                                    <input
-                                        type="number"
-                                        id="overtimePayRate"
-                                        name="overtimePayRate"
-                                        value={formData.overtimePayRate}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="fuelAllowance">Fuel Allowance:</label>
-                                    <input
-                                        type="number"
-                                        id="fuelAllowance"
-                                        name="fuelAllowance"
-                                        value={formData.fuelAllowance}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="medicalAllowance">Medical Allowance:</label>
-                                    <input
-                                        type="number"
-                                        id="medicalAllowance"
-                                        name="medicalAllowance"
-                                        value={formData.medicalAllowance}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="noPayLeaveDeductionRate">No Pay Leave Deduction Rate:</label>
-                                    <input
-                                        type="number"
-                                        id="noPayLeaveDeductionRate"
-                                        name="noPayLeaveDeductionRate"
-                                        value={formData.noPayLeaveDeductionRate}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="epfDeduction">EPF Deduction:</label>
-                                    <input
-                                        type="number"
-                                        id="epfDeduction"
-                                        name="epfDeduction"
-                                        value={formData.epfDeduction}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="welfareDeduction">Welfare Deduction:</label>
-                                    <input
-                                        type="number"
-                                        id="welfareDeduction"
-                                        name="welfareDeduction"
-                                        value={formData.welfareDeduction}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="taxDeduction">Tax Deduction:</label>
-                                    <input
-                                        type="number"
-                                        id="taxDeduction"
-                                        name="taxDeduction"
-                                        value={formData.taxDeduction}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
+                                {/* Add more input fields for other details */}
                             </div>
                             <div>
                                 <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
@@ -239,7 +162,7 @@ const Designation = () => {
             <table className="w-full border border-collapse border-gray-300">
                 <thead>
                     <tr className="bg-gray-200">
-                        <th className="px-4 py-2 border border-gray-300">Section</th>
+                        <th className="px-4 py-2 border border-gray-300">Department</th>
                         <th className="px-4 py-2 border border-gray-300">Designation</th>
                         <th className="px-4 py-2 border border-gray-300">Update</th>
                         <th className="px-4 py-2 border border-gray-300">Delete</th>
@@ -248,7 +171,7 @@ const Designation = () => {
                 <tbody>
                     {filteredDesignations.map((designation) => (
                         <tr key={designation.id}>
-                            <td className="px-4 py-2 border border-gray-300">{designation.section}</td>
+                            <td className="px-4 py-2 border border-gray-300">{designation.department}</td>
                             <td className="px-4 py-2 border border-gray-300">{designation.designation}</td>
                             <td className="px-4 py-2 border border-gray-300">
                                 <button onClick={() => handleEdit(designation.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
