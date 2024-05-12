@@ -72,25 +72,23 @@ const UserTaskHistory = () => {
                     onChange={(e) => setSelectedYear(e.target.value)}
                 />
             </div>
-            <div className="overflow-hidden bg-white rounded-lg shadow-md">
-                <div className="p-6">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Task Title</th>
-                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
+            <div className="overflow-x-auto">
+                <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Task Title</th>
+                            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {filteredTaskHistory.map((task) => (
+                            <tr key={task.id}>
+                                <td className="px-6 py-4 whitespace-nowrap">{task.taskTitle}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{task.status}</td>
                             </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredTaskHistory.map((task) => (
-                                <tr key={task.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">{task.taskTitle}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{task.status}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
