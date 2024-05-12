@@ -1,6 +1,7 @@
 import React from 'react';
 import AddEmp from '../components/AddEmp';
 
+
 import { FaUser } from 'react-icons/fa'; // Import the user icon
 
 const Employee = () => {
@@ -12,12 +13,12 @@ const Employee = () => {
 
     return (
         <div>
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white shadow-md">
-                <h1 className="text-3xl font-bold">Employee</h1>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-gray-900 shadow-md">
+                <h1 className="text-3xl font-bold text-white">Employee</h1>
                 <div className="flex items-center">
                     {/* Profile icon with click event */}
                     <FaUser
-                        className="mr-4 text-xl text-gray-600 cursor-pointer"
+                        className="mr-4 text-xl text-white"
                         onClick={handleProfileClick} // Attach onClick event handler
                     />
                     {/* Add your profile menu here */}

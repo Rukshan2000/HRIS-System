@@ -37,7 +37,6 @@ const generateRandomPassword = () => {
 
 const AddEmployee = () => {
     const [showForm, setShowForm] = useState(false);
-    const [updateFormVisible, setUpdateFormVisible] = useState(false);
     const [formData, setFormData] = useState({
         employeeId: '',
         password: ''
@@ -51,12 +50,6 @@ const AddEmployee = () => {
     ]);
 
     const toggleForm = () => setShowForm(!showForm);
-    const toggleUpdateForm = () => setUpdateFormVisible(!updateFormVisible);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
 
     const handleSelectChange = (selectedOption) => {
         setFormData({ ...formData, employeeId: selectedOption.value });
@@ -64,10 +57,15 @@ const AddEmployee = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!formData.employeeId) {
+            alert('Please select an employee ID.');
+            return;
+        }
+        const newPassword = generateRandomPassword();
         const newEmployee = {
             id: employees.length + 1,
             employeeId: formData.employeeId,
-            password: formData.password
+            password: newPassword
         };
         setEmployees([...employees, newEmployee]);
         setFormData({ employeeId: '', password: '' });
@@ -75,14 +73,32 @@ const AddEmployee = () => {
         downloadCredentials(newEmployee);
     };
 
-    const handleUpdatePassword = () => {
+    const handleUpdate = (id) => {
+        const employeeToUpdate = employees.find(emp => emp.id === id);
+        const newPassword = generateRandomPassword();
+        
+        // Update employee's password
         const updatedEmployees = employees.map(emp =>
-            emp.id === formData.id ? { ...emp, password: formData.password } : emp
+            emp.id === id ? { ...emp, password: newPassword } : emp
         );
         setEmployees(updatedEmployees);
-        setFormData({ ...formData, password: '', employeeId: '' });
-        toggleUpdateForm();
-        downloadCredentials(formData);
+    
+        // Download updated credentials
+        const updatedEmployee = { ...employeeToUpdate, password: newPassword };
+        downloadCredentials(updatedEmployee);
+    };
+    
+    const handleDelete = (id) => {
+        // Add logic to delete employee data
+        setEmployees(employees.filter(emp => emp.id !== id));
+    };
+
+    const handleCopyPassword = (password) => {
+        navigator.clipboard.writeText(password);
+        setNotification('Password copied successfully. Paste password in password box.');
+        setTimeout(() => {
+            setNotification('');
+        }, 3000);
     };
 
     const downloadCredentials = (employee) => {
@@ -97,30 +113,6 @@ const AddEmployee = () => {
         a.click();
         URL.revokeObjectURL(url);
         document.body.removeChild(a);
-    };
-
-    const handleUpdate = (id) => {
-        toggleUpdateForm();
-        const employeeToUpdate = employees.find(emp => emp.id === id);
-        setFormData({ ...formData, employeeId: employeeToUpdate.employeeId });
-    };
-
-    const handleDelete = (id) => {
-        // Add logic to delete employee data
-        setEmployees(employees.filter(emp => emp.id !== id));
-    };
-
-    const handleCancel = () => {
-        setShowForm(false);
-        setUpdateFormVisible(false);
-    };
-
-    const handleCopyPassword = (password) => {
-        navigator.clipboard.writeText(password);
-        setNotification('Password copied successfully. Paste password in password box.');
-        setTimeout(() => {
-            setNotification('');
-        }, 3000);
     };
 
     return (
@@ -149,50 +141,13 @@ const AddEmployee = () => {
                                     options={options}
                                     className="w-full"
                                     placeholder="Select Employee ID"
+                                    required // Make the select required
                                 />
                             </div>
-                            <div className="flex mb-4">
-                                <label htmlFor="password" className="block mb-1 text-sm font-semibold">Password:</label>
-                                <input
-                                    type="text"
-                                    id="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                                <button type="button" onClick={() => handleCopyPassword(generateRandomPassword())} className="px-4 py-2 ml-2 text-white bg-gray-500 rounded-md">Copy Random Password</button>
-                            </div>
+
                             <div className="flex justify-between">
                                 <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
-                                <button type="button" onClick={handleCancel} className="px-4 py-2 text-white bg-gray-500 rounded-md">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-            {updateFormVisible && (
-                <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-50">
-                    <div className="p-6 bg-white rounded-lg shadow-md">
-                        <h2 className="mb-4 text-lg font-semibold">Reset Password</h2>
-                        <form onSubmit={handleUpdatePassword} className="grid grid-cols-1 gap-4">
-                            <div className="flex mb-4">
-                                <label htmlFor="password" className="block mb-1 text-sm font-semibold">New Password:</label>
-                                <input
-                                    type="text"
-                                    id="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                                <button type="button" onClick={() => handleCopyPassword(generateRandomPassword())} className="px-4 py-2 ml-2 text-white bg-gray-500 rounded-md">Copy Random Password</button>
-                            </div>
-                            <div className="flex justify-between">
-                                <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Reset</button>
-                                <button type="button" onClick={handleCancel} className="px-4 py-2 text-white bg-gray-500 rounded-md">Cancel</button>
+                                <button type="button" onClick={toggleForm} className="px-4 py-2 text-white bg-gray-500 rounded-md">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -212,7 +167,7 @@ const AddEmployee = () => {
                             <tr key={employee.id}>
                                 <td className="px-4 py-2 border">{employee.employeeId}</td>
                                 <td className="px-4 py-2 border">
-                                    <button onClick={() => handleUpdate(employee.id)} className="px-3 py-1 mr-2 text-white bg-green-500 rounded-md">Update</button>
+                                    <button onClick={() => handleUpdate(employee.id)} className="px-3 py-1 mr-2 text-white bg-green-500 rounded-md">Reset</button>
                                     <button onClick={() => handleDelete(employee.id)} className="px-3 py-1 text-white bg-red-500 rounded-md">Delete</button>
                                 </td>
                             </tr>

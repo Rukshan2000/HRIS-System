@@ -2,6 +2,7 @@
 import React from 'react';
 import TopNav from '../components/TopNav';
 import UserSummery from '../components/UserSummery';
+import DisplayAnn from '../components/DisplayAnn';
 
 
 const MyDashboard = () => {
@@ -9,6 +10,7 @@ const MyDashboard = () => {
         <div>
             <TopNav/>            
             <UserSummery/>
+            <DisplayAnn/>
 
         </div>
     );
