@@ -77,7 +77,7 @@ const UserTaskHistory = () => {
                     {filteredTaskHistory.map((task) => (
                         <div key={task.id} className="p-4 mb-4 rounded-lg">
                             <div className="mb-2 overflow-hidden font-bold overflow-ellipsis">{task.taskTitle}</div>
-                            <div className={`text-white py-1 px-2 rounded ${task.status === 'Completed' ? 'bg-green-500' : task.status === 'In Progress' ? 'bg-yellow-600' : task.status === 'Not Completed' ? 'bg-red-500' : ''}`}>{task.status}</div>
+                            <div className={`text-white py-1 px-2 rounded ${task.status === 'Completed' ? 'bg-green-500' : task.status === 'In Progress' ? 'bg-yellow-500' : task.status === 'Not Completed' ? 'bg-red-500' : ''}`}>{task.status}</div>
                         </div>
                     ))}
                 </div>
