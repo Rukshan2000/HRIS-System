@@ -15,7 +15,7 @@ const UserTaskHistory = () => {
         {
             id: 2,
             taskTitle: "Project Presentation",
-            status: "Completed",
+            status: "Not Completed",
             month: "June",
             year: "2024"
         },
@@ -72,24 +72,14 @@ const UserTaskHistory = () => {
                     onChange={(e) => setSelectedYear(e.target.value)}
                 />
             </div>
-            <div className="overflow-hidden bg-white rounded-lg shadow-md">
-                <div className="p-6">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Task Title</th>
-                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredTaskHistory.map((task) => (
-                                <tr key={task.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">{task.taskTitle}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{task.status}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            <div className="overflow-x-auto">
+                <div>
+                    {filteredTaskHistory.map((task) => (
+                        <div key={task.id} className="p-4 mb-4 rounded-lg">
+                            <div className="mb-2 overflow-hidden font-bold overflow-ellipsis">{task.taskTitle}</div>
+                            <div className={`text-white py-1 px-2 rounded ${task.status === 'Completed' ? 'bg-green-500' : task.status === 'In Progress' ? 'bg-yellow-500' : task.status === 'Not Completed' ? 'bg-red-500' : ''}`}>{task.status}</div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
