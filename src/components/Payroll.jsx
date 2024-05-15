@@ -2,23 +2,30 @@ import React, { useState } from 'react';
 
 const Payroll = () => {
     const [employees, setEmployees] = useState([
-        { id: 1, section: 'Section A', designation: 'Manager', otHours: 5, noPayLeaves: 2, loanDeduction: 100 },
-        { id: 2, section: 'Section B', designation: 'Developer', otHours: 3, noPayLeaves: 1, loanDeduction: 50 },
+        { id: 1, department: 'department A', otHours: 5, noPayLeaves: 2, taxPercentage: 5, epf: 200, etf: 100, allowance: 100, salary: 2000 },
+        { id: 2, department: 'department B', otHours: 3, noPayLeaves: 1, taxPercentage: 3, epf: 150, etf: 80, allowance: 150, salary: 2500 },
+        { id: 3, department: 'department C', otHours: 1, noPayLeaves: 1, taxPercentage: 10, epf: 100, etf: 200, allowance: 100, salary: 10000 },
         // Add more employees here
     ]);
 
+    // Dummy data for OT and no pay rates
+    const otHourlyRate = 1000;
+    const noPayDeduction = 500;
+
     const [formData, setFormData] = useState({
         id: '',
-        section: '',
-        designation: '',
+        department: '',
         otHours: '',
         noPayLeaves: '',
-        loanDeduction: ''
+        taxPercentage: '',
+        epf: '',
+        etf: '',
+        allowance: '',
+        salary: ''
     });
 
     const [filters, setFilters] = useState({
-        section: '',
-        designation: ''
+        department: ''
     });
 
     const [showForm, setShowForm] = useState(false);
@@ -45,7 +52,7 @@ const Payroll = () => {
         } else {
             setEmployees([...employees, { ...formData, id: Date.now() }]);
         }
-        setFormData({ id: '', section: '', designation: '', otHours: '', noPayLeaves: '', loanDeduction: '' });
+        setFormData({ id: '', department: '', otHours: '', noPayLeaves: '', taxPercentage: '', epf: '', etf: '', allowance: '', salary: '' });
         setShowForm(false);
     };
 
@@ -60,11 +67,34 @@ const Payroll = () => {
         setEmployees(updatedEmployees);
     };
 
+    const handleGenerate = (id) => {
+        const updatedEmployees = employees.map((emp) => {
+            if (emp.id === id) {
+                const totalOT = parseInt(emp.otHours) * otHourlyRate;
+                const totalNPLeaves = parseInt(emp.noPayLeaves) * noPayDeduction;
+                const totalSalary = parseInt(emp.salary) + totalOT - totalNPLeaves;
+                const totalAllowance = parseInt(emp.allowance);
+                const totalEPF = parseInt(emp.epf);
+                const totalETF = parseInt(emp.etf);
+                const total = totalSalary + totalAllowance - totalEPF - totalETF;
+                const taxPercentage = parseInt(emp.taxPercentage);
+                const tax = (total * taxPercentage) / 100;
+                const totalIncome = total - tax;
+    
+                return {
+                    ...emp,
+                    totalIncome: totalIncome
+                };
+            }
+            return emp;
+        });
+        setEmployees(updatedEmployees);
+    };
+
     const filteredEmployees = employees.filter((emp) => {
-        const { section, designation } = filters;
+        const { department } = filters;
         return (
-            emp.section.toLowerCase().includes(section.toLowerCase()) &&
-            emp.designation.toLowerCase().includes(designation.toLowerCase())
+            emp.department.toLowerCase().includes(department.toLowerCase())
         );
     });
 
@@ -73,19 +103,11 @@ const Payroll = () => {
             <div className="flex mb-4">
                 <input
                     type="text"
-                    name="section"
-                    value={filters.section}
+                    name="department"
+                    value={filters.department}
                     onChange={handleFilterChange}
-                    placeholder="Filter by Section"
+                    placeholder="Filter by Department"
                     className="px-3 py-2 mr-2 border border-gray-300 rounded-md"
-                />
-                <input
-                    type="text"
-                    name="designation"
-                    value={filters.designation}
-                    onChange={handleFilterChange}
-                    placeholder="Filter by Designation"
-                    className="px-3 py-2 border border-gray-300 rounded-md"
                 />
             </div>
             <button
@@ -112,24 +134,24 @@ const Payroll = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="section" className="block mb-1 text-sm font-semibold">Section:</label>
+                                <label htmlFor="department" className="block mb-1 text-sm font-semibold">Department:</label>
                                 <input
                                     type="text"
-                                    id="section"
-                                    name="section"
-                                    value={formData.section}
+                                    id="department"
+                                    name="department"
+                                    value={formData.department}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="designation" className="block mb-1 text-sm font-semibold">Designation:</label>
+                                <label htmlFor="allowance" className="block mb-1 text-sm font-semibold">Allowance:</label>
                                 <input
-                                    type="text"
-                                    id="designation"
-                                    name="designation"
-                                    value={formData.designation}
+                                    type="number"
+                                    id="allowance"
+                                    name="allowance"
+                                    value={formData.allowance}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required
@@ -160,20 +182,46 @@ const Payroll = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="loanDeduction" className="block mb-1 text-sm font-semibold">Loan Deduction:</label>
+                                <label htmlFor="taxPercentage" className="block mb-1 text-sm font-semibold">Tax Percentage:</label>
                                 <input
                                     type="number"
-                                    id="loanDeduction"
-                                    name="loanDeduction"
-                                    value={formData.loanDeduction}
+                                    id="taxPercentage"
+                                    name="taxPercentage"
+                                    value={formData.taxPercentage}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required
                                 />
                             </div>
-                            <div className="col-span-2">
-                                <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
-                                <button type="button" onClick={toggleForm} className="px-4 py-2 ml-2 text-white bg-gray-500 rounded-md">Cancel</button>
+                            <div className="mb-4">
+                                <label htmlFor="epf" className="block mb-1 text-sm font-semibold">EPF:</label>
+                                <input
+                                    type="number"
+                                    id="epf"
+                                    name="epf"
+                                    value={formData.epf}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="etf" className="block mb-1 text-sm font-semibold">ETF:</label>
+                                <input
+                                    type="number"
+                                    id="etf"
+                                    name="etf"
+                                    value={formData.etf}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    required
+                                />
+                            </div>
+                            <div className="flex items-center justify-between col-span-2">
+                                <div>
+                                    <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
+                                    <button type="button" onClick={toggleForm} className="px-4 py-2 ml-2 text-white bg-gray-500 rounded-md">Cancel</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -184,11 +232,15 @@ const Payroll = () => {
                     <thead>
                         <tr className="bg-gray-200">
                             <th className="px-4 py-2 border border-gray-300">Emp ID</th>
-                            <th className="px-4 py-2 border border-gray-300">Section</th>
-                            <th className="px-4 py-2 border border-gray-300">Designation</th>
+                            <th className="px-4 py-2 border border-gray-300">Department</th>
                             <th className="px-4 py-2 border border-gray-300">OT hours</th>
                             <th className="px-4 py-2 border border-gray-300">No Pay Leaves</th>
-                            <th className="px-4 py-2 border border-gray-300">Loan Deduction</th>
+                            <th className="px-4 py-2 border border-gray-300">Tax Percentage</th>
+                            <th className="px-4 py-2 border border-gray-300">EPF</th>
+                            <th className="px-4 py-2 border border-gray-300">ETF</th>
+                            <th className="px-4 py-2 border border-gray-300">Allowance</th>
+                            <th className="px-4 py-2 border border-gray-300">Salary</th>
+                            <th className="px-4 py-2 border border-gray-300">Total Income</th>
                             <th className="px-4 py-2 border border-gray-300">Actions</th>
                         </tr>
                     </thead>
@@ -196,14 +248,20 @@ const Payroll = () => {
                         {filteredEmployees.map((emp) => (
                             <tr key={emp.id}>
                                 <td className="px-4 py-2 border border-gray-300">{emp.id}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.section}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.designation}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.department}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.otHours}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.noPayLeaves}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.loanDeduction}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.taxPercentage}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.epf}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.etf}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.allowance}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.salary}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.totalIncome}</td>
                                 <td className="px-4 py-2 border border-gray-300">
                                     <button onClick={() => handleEdit(emp.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
                                     <button onClick={() => handleDelete(emp.id)} className="px-3 py-1 ml-2 text-white bg-red-500 rounded-md">Delete</button>
+                                    <button type="button" onClick={() => handleGenerate(emp.id)} className="px-3 py-1 ml-2 text-white bg-green-500 rounded-md">Generate</button>
+
                                 </td>
                             </tr>
                         ))}
