@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+
+
 import {
     FaTh,
     FaBars,
@@ -12,6 +17,8 @@ import {
     FaSignOutAlt // Add sign-out icon
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
+
+
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -60,10 +67,34 @@ const Sidebar = ({ children }) => {
         },
    
     ];
+    
+    const [auth,setAuth] = useState(false);
+    const navigate = useNavigate()
+
+
+    const handleDelete = () => {
+       
+      };
+    
 
     const handleSignOut = () => {
-        // Redirect to splash screen
-        window.location.href = '/splashpage';
+        //call api to clear cookie
+        axios.get('http://localhost:8081/logout')
+        .then(res => {
+          if (res.data.Status === 'Success') {
+            // Update the state to reflect logged-out state
+            setAuth(false);
+            // Optionally redirect the user to another page
+            navigate('/splashpage');
+          } else {
+            // Handle logout failure, display an error message, etc.
+            console.log('Logout failed:', res.data.Error);
+          }
+        })
+        .catch(err => console.log(err));
+
+        // // Redirect to splash screen
+        // window.location.href = '/splashpage';
     };
 
     return (

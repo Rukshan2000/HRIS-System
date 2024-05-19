@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
+import axios from 'axios';
 
 const options = [
     { value: '1', label: 'Employee 1' },
@@ -71,6 +72,7 @@ const AddEmployee = () => {
         setFormData({ employeeId: '', password: '' });
         setShowForm(false);
         downloadCredentials(newEmployee);
+        saveUser(newEmployee);
     };
 
     const handleUpdate = (id) => {
@@ -113,6 +115,16 @@ const AddEmployee = () => {
         a.click();
         URL.revokeObjectURL(url);
         document.body.removeChild(a);
+    };
+
+    const saveUser = (employee)=>{
+        const { employeeId, password } = employee;
+        const employeeObj={username: employeeId,password: password}
+        axios.post('http://localhost:8081/signup',employeeObj)
+        .then(res =>{
+            console.log(res);
+        })
+        .catch(err => console.log(err));
     };
 
     return (

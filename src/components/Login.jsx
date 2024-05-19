@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { FaEye } from 'react-icons/fa';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -19,20 +21,47 @@ const Login = () => {
         setShowPassword(!showPassword);
     };
 
+    const navigate = useNavigate();
+
+    axios.defaults.withCredentials = true;
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Check if username and password match
-        if (username === 'admin' && password === 'admin') {
-            // Authentication successful, redirect to dashboard
-            window.location.href = '/dashboard';
-        } else if (username === 'employee' && password === 'employee') {
-            // Authentication successful for employee, redirect to mydashboard
-            window.location.href = '/mydashboard';
-        } else {
-            // Authentication failed, show error message
-            setShowError(true);
-        }
+        const data = {
+            username: username,
+            password: password
+        };
+
+        axios.post('http://localhost:8081/login', data)
+        .then(res => {
+            if (res.data.Login) {
+                if (res.data.role === 'admin') {
+                    localStorage.setItem("token",res.data.token);
+                    navigate('/dashboard');
+                } else {
+                    navigate('/mydashboard');
+                }
+            } else {
+                alert(res.data.Error); // Notify the user of the specific error
+            }
+            console.log(res);
+        })
+        .catch(err => console.log(err));
+
+
+
+        // // Check if username and password match
+        // if (username === 'admin' && password === 'admin') {
+        //     // Authentication successful, redirect to dashboard
+        //     window.location.href = '/dashboard';
+        // } else if (username === 'employee' && password === 'employee') {
+        //     // Authentication successful for employee, redirect to mydashboard
+        //     window.location.href = '/mydashboard';
+        // } else {
+        //     // Authentication failed, show error message
+        //     setShowError(true);
+        // }
     };
 
     return (
