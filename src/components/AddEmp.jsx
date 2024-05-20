@@ -64,10 +64,12 @@ const Employee = () => {
         setFormData({
             id: '',
             fullName: '',
+            dateOfBirth:'',
             department: '',
             designation: '',
             employmentStartDate: '',
             emergencyContactName: '',
+            emergencyContactNumber: '',
             bloodCategory: '',
             permanentAddress: '',
             dateOfBirth: '',
@@ -160,6 +162,20 @@ const Employee = () => {
                                 />
                             </div>
                             <div className="mb-4">
+                                <label htmlFor="dateOfBirth" className="block mb-1 text-sm font-semibold">
+                                    Date of birth:
+                                </label>
+                                <input
+                                    type="date"
+                                    id="dateOfBirth"
+                                    name="dateOfBirth"
+                                    value={formData.dateOfBirth}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
                                 <label htmlFor="employmentStartDate" className="block mb-1 text-sm font-semibold">
                                     Employment Start Date:
                                 </label>
@@ -182,6 +198,20 @@ const Employee = () => {
                                     id="emergencyContactName"
                                     name="emergencyContactName"
                                     value={formData.emergencyContactName}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="emergencyContactNumber" className="block mb-1 text-sm font-semibold">
+                                    Emergency Contact Number:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="emergencyContactNumber"
+                                    name="emergencyContactNumber"
+                                    value={formData.emergencyContactNumber}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required

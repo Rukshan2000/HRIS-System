@@ -46,7 +46,7 @@ const SubNav = () => {
         </li>
         <li className="mx-4 my-6 text-center md:my-0">
           <button className="text-base font-bold text-white duration-500 hover:text-green-500 font-Poppins" onClick={() => handleButtonClick("/SecureLayer")}>
-            AddEmployee
+            Add Employee
           </button>
         </li>
 
