@@ -8,10 +8,6 @@ const Payroll = () => {
         // Add more employees here
     ]);
 
-    // Dummy data for OT and no pay rates
-    const otHourlyRate = 1000;
-    const noPayDeduction = 500;
-
     const [formData, setFormData] = useState({
         id: '',
         department: '',
@@ -70,6 +66,9 @@ const Payroll = () => {
     const handleGenerate = (id) => {
         const updatedEmployees = employees.map((emp) => {
             if (emp.id === id) {
+                const otHourlyRate = parseInt(emp.salary) / 720;
+                const noPayDeduction = parseInt(emp.salary) / 30;
+                
                 const totalOT = parseInt(emp.otHours) * otHourlyRate;
                 const totalNPLeaves = parseInt(emp.noPayLeaves) * noPayDeduction;
                 const totalSalary = parseInt(emp.salary) + totalOT - totalNPLeaves;
@@ -261,7 +260,6 @@ const Payroll = () => {
                                     <button onClick={() => handleEdit(emp.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
                                     <button onClick={() => handleDelete(emp.id)} className="px-3 py-1 ml-2 text-white bg-red-500 rounded-md">Delete</button>
                                     <button type="button" onClick={() => handleGenerate(emp.id)} className="px-3 py-1 ml-2 text-white bg-green-500 rounded-md">Generate</button>
-
                                 </td>
                             </tr>
                         ))}
