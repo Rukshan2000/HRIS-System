@@ -22,7 +22,8 @@ import PayRollUser from './pages/PayRollUser.jsx';
 import LeaveUser from './pages/LeaveUser.jsx';
 import EmployeeUpdate from './pages/EmployeeUpdate.jsx';
 import Announcement from './pages/Announcement.jsx';
-
+import PrivateRoutes from './utils/PrivateRoutes.js';
+import Page404 from './pages/Page404.jsx';
 
 
 
@@ -33,27 +34,29 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/splashpage" />} /> {/* Redirect to AdminLogin */}
         <Route path="/adminlogin" element={<AdminLogin />} />
-        <Route path="/addemployee" element={<Sidebar><AddEmployee /></Sidebar>} />
         <Route path="/splashpage" element={<SplashPage />} />
-        <Route path="/dashboard/*" element={<Sidebar><Dashboard /></Sidebar>} /> {/* Protected route for Dashboard */}
-        <Route path="/payroll" element={<Sidebar><Payroll /></Sidebar>} />
-        <Route path="/leave" element={<Sidebar><Leave /></Sidebar>} />
-        <Route path="/employee" element={<Sidebar><Employee /></Sidebar>} />
-        <Route path="/designations" element={<Sidebar><Designations /></Sidebar>} />
-        <Route path="/tasks" element={<Sidebar><Tasks /></Sidebar>} />
         <Route path="/signup" element={<Sidebar><Signup /></Sidebar>} />
-        <Route path="/securelayer" element={<Sidebar><SecureLayer /></Sidebar>} />
-        <Route path="/adminprofile" element={<Sidebar><AdminProfile /></Sidebar>} />
-        <Route path="/announcement" element={<Sidebar><Announcement /></Sidebar>} />
-        <Route path="/employeeupdate" element={<Sidebar><EmployeeUpdate /></Sidebar>} />
-        <Route path="/mydashboard" element={<MyDashboard />} /> 
-        <Route path="/leaveuser" element={<LeaveUser />} /> 
-        <Route path="/payrolluser" element={<PayRollUser />} /> 
-        <Route path="/profileuser" element={<ProfileUser />} /> 
-        <Route path="/taskuser" element={<TaskUser />} /> 
-
-
-
+        
+        {/* Protected routes  */}
+        <Route element={<PrivateRoutes/>}>
+          <Route path="/dashboard/*" element={<Sidebar><Dashboard /></Sidebar>} />
+          <Route path="/addemployee" element={<Sidebar><AddEmployee /></Sidebar>} />
+          <Route path="/payroll" element={<Sidebar><Payroll /></Sidebar>} />
+          <Route path="/leave" element={<Sidebar><Leave /></Sidebar>} />
+          <Route path="/employee" element={<Sidebar><Employee /></Sidebar>} />
+          <Route path="/designations" element={<Sidebar><Designations /></Sidebar>} />
+          <Route path="/tasks" element={<Sidebar><Tasks /></Sidebar>} />
+          <Route path="/securelayer" element={<Sidebar><SecureLayer /></Sidebar>} />
+          <Route path="/adminprofile" element={<Sidebar><AdminProfile /></Sidebar>} />
+          <Route path="/announcement" element={<Sidebar><Announcement /></Sidebar>} />
+          <Route path="/employeeupdate" element={<Sidebar><EmployeeUpdate /></Sidebar>} />
+          <Route path="/mydashboard" element={<MyDashboard />} /> 
+          <Route path="/leaveuser" element={<LeaveUser />} /> 
+          <Route path="/payrolluser" element={<PayRollUser />} /> 
+          <Route path="/profileuser" element={<ProfileUser />} /> 
+          <Route path="/taskuser" element={<TaskUser />} />
+          <Route path="*" element={<Page404 />} /> 
+        </Route> 
 
       </Routes>
     </BrowserRouter>

@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+
+
 import {
     FaTh,
     FaBars,
@@ -12,6 +17,8 @@ import {
     FaSignOutAlt // Add sign-out icon
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
+
+
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -60,10 +67,19 @@ const Sidebar = ({ children }) => {
         },
    
     ];
+    
+    const [auth,setAuth] = useState(false);
+    const navigate = useNavigate()
+
+
+    const handleDelete = () => {
+       
+      };
+    
 
     const handleSignOut = () => {
-        // Redirect to splash screen
-        window.location.href = '/splashpage';
+        localStorage.removeItem('token');  // Remove the JWT in local storage
+        navigate('/splashpage');
     };
 
     return (
