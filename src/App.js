@@ -23,7 +23,7 @@ import LeaveUser from './pages/LeaveUser.jsx';
 import EmployeeUpdate from './pages/EmployeeUpdate.jsx';
 import Announcement from './pages/Announcement.jsx';
 import PrivateRoutes from './utils/PrivateRoutes.js';
-
+import Page404 from './pages/Page404.jsx';
 
 
 
@@ -54,7 +54,8 @@ const App = () => {
           <Route path="/leaveuser" element={<LeaveUser />} /> 
           <Route path="/payrolluser" element={<PayRollUser />} /> 
           <Route path="/profileuser" element={<ProfileUser />} /> 
-          <Route path="/taskuser" element={<TaskUser />} /> 
+          <Route path="/taskuser" element={<TaskUser />} />
+          <Route path="*" element={<Page404 />} /> 
         </Route> 
 
       </Routes>

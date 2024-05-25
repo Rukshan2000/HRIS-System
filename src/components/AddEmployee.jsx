@@ -119,8 +119,8 @@ const AddEmployee = () => {
 
     const saveUser = (employee)=>{
         const { employeeId, password } = employee;
-        const employeeObj={username: employeeId,password: password}
-        axios.post('http://localhost:8081/signup',employeeObj)
+        const employeeObj={username: employeeId,password: password, role: 'admin'}
+        axios.post('http://localhost:8081/api/users/',employeeObj)
         .then(res =>{
             console.log(res);
         })

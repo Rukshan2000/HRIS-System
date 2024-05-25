@@ -33,15 +33,17 @@ const Login = () => {
             password: password
         };
 
-        axios.post('http://localhost:8081/login', data)
+        axios.post('http://localhost:8081/api/users/login', data)
         .then(res => {
-            if (res.data.Login) {
-                if (res.data.role === 'admin') {
-                    localStorage.setItem("token",res.data.token);
-                    navigate('/dashboard');
-                } else {
-                    navigate('/mydashboard');
-                }
+            if (res.data.success==1) {
+                // if (res.data.role === 'admin') {
+                //     localStorage.setItem("token",res.data.token);
+                //     navigate('/dashboard');
+                // } else {
+                //     navigate('/mydashboard');
+                // }
+                localStorage.setItem("token",res.data.token);
+                navigate('/dashboard');
             } else {
                 alert(res.data.Error); // Notify the user of the specific error
             }

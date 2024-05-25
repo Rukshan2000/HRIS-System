@@ -78,23 +78,8 @@ const Sidebar = ({ children }) => {
     
 
     const handleSignOut = () => {
-        //call api to clear cookie
-        axios.get('http://localhost:8081/logout')
-        .then(res => {
-          if (res.data.Status === 'Success') {
-            // Update the state to reflect logged-out state
-            setAuth(false);
-            // Optionally redirect the user to another page
-            navigate('/splashpage');
-          } else {
-            // Handle logout failure, display an error message, etc.
-            console.log('Logout failed:', res.data.Error);
-          }
-        })
-        .catch(err => console.log(err));
-
-        // // Redirect to splash screen
-        // window.location.href = '/splashpage';
+        localStorage.removeItem('token');  // Remove the JWT in local storage
+        navigate('/splashpage');
     };
 
     return (
