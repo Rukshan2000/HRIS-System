@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/signup" element={<Sidebar><Signup /></Sidebar>} />
         
         {/* Protected routes  */}
-        <Route element={<PrivateRoutes/>}>
+        {/* <Route element={<PrivateRoutes/>}> */}
           <Route path="/dashboard/*" element={<Sidebar><Dashboard /></Sidebar>} />
           <Route path="/addemployee" element={<Sidebar><AddEmployee /></Sidebar>} />
           <Route path="/payroll" element={<Sidebar><Payroll /></Sidebar>} />
@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/profileuser" element={<ProfileUser />} /> 
           <Route path="/taskuser" element={<TaskUser />} />
           <Route path="*" element={<Page404 />} /> 
-        </Route> 
+        {/* </Route>  */}
 
       </Routes>
     </BrowserRouter>
