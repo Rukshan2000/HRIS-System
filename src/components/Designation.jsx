@@ -1,29 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Designation = () => {
     // State for departments
-    const [departments, setDepartments] = useState(['Department A', 'Department B', 'Department C']);
+    const [departments, setDepartments] = useState([]);
 
-    // Dummy data for designations
-    const [designations, setDesignations] = useState([
-        { id: 1, department: 'Department A', designation: 'Manager', basicSalary: 5000 },
-        { id: 2, department: 'Department B', designation: 'Developer', basicSalary: 4000 },
-        // Add more designations here
-    ]);
+    // State for designations
+    const [designations, setDesignations] = useState([]);
 
     // Form data state
     const [formData, setFormData] = useState({
-        id: '',
+        id: 0,
         department: '',
         designation: '',
         basicSalary: '',
-        overtimePayRate: '',
-        fuelAllowance: '',
-        medicalAllowance: '',
-        noPayLeaveDeductionRate: '',
-        epfDeduction: '',
-        welfareDeduction: '',
-        taxDeduction: ''
     });
 
     // New department state
@@ -42,7 +32,10 @@ const Designation = () => {
     // Function to handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
     };
 
     // Function to handle new department input change
@@ -75,13 +68,6 @@ const Designation = () => {
             department: '',
             designation: '',
             basicSalary: '',
-            overtimePayRate: '',
-            fuelAllowance: '',
-            medicalAllowance: '',
-            noPayLeaveDeductionRate: '',
-            epfDeduction: '',
-            welfareDeduction: '',
-            taxDeduction: ''
         });
         // Close the form
         setShowForm(false);
@@ -97,25 +83,47 @@ const Designation = () => {
 
     // Function to handle edit button click
     const handleEdit = (id) => {
-        const designationToEdit = designations.find((item) => item.id === id);
-        setFormData(designationToEdit);
-        setShowForm(true);
+        axios.get(`http://localhost:8081/api/designation/${id}`)
+            .then(res => {
+                const data = res.data;
+                setFormData({
+                    id: data.Desig_ID,
+                    department: data.Department_ID,
+                    designation: data.Name,
+                    basicSalary: data.Base_Salary,
+                });
+                setShowForm(true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     };
 
     // Function to handle delete button click
-    const handleDelete = (id) => {
-        const updatedDesignations = designations.filter((item) => item.id !== id);
-        setDesignations(updatedDesignations);
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`http://localhost:8081/api/designation/${id}`);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error deleting designation:', error);
+        }
     };
 
-    // Function to filter designations based on filters
-    const filteredDesignations = designations.filter((designation) => {
-        const { department, designation: desig } = filters;
-        return (
-            designation.department.toLowerCase().includes(department.toLowerCase()) &&
-            designation.designation.toLowerCase().includes(desig.toLowerCase())
-        );
-    });
+    useEffect(() => {
+        axios.get('http://localhost:8081/api/designation')
+            .then(res => {
+                setDesignations(res.data.data);
+            })
+            .catch(err => console.log(err));
+
+        axios.get('http://localhost:8081/api/department')
+            .then(res => {
+                setDepartments(res.data.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
 
     return (
         <div className="container flex flex-col items-start mx-auto">
@@ -127,9 +135,9 @@ const Designation = () => {
                     className="px-3 py-2 mr-2 border border-gray-300 rounded-md"
                 >
                     <option value="">Filter by Department</option>
-                    {departments.map((dept, idx) => (
-                        <option key={idx} value={dept}>
-                            {dept}
+                    {departments.map((department, index) => (
+                        <option key={index} value={department.Dept_ID}>
+                            {department.Name}
                         </option>
                     ))}
                 </select>
@@ -160,9 +168,9 @@ const Designation = () => {
                                         required
                                     >
                                         <option value="">Select Department</option>
-                                        {departments.map((dept, idx) => (
-                                            <option key={idx} value={dept}>
-                                                {dept}
+                                        {departments.map((department, index) => (
+                                            <option key={index} value={department.Dept_ID}>
+                                                {department.Name}
                                             </option>
                                         ))}
                                     </select>
@@ -191,7 +199,6 @@ const Designation = () => {
                                         required
                                     />
                                 </div>
-                                {/* Add more input fields for other details */}
                             </div>
                             <div>
                                 <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
@@ -224,15 +231,15 @@ const Designation = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredDesignations.map((designation) => (
-                        <tr key={designation.id}>
-                            <td className="px-4 py-2 border border-gray-300">{designation.department}</td>
-                            <td className="px-4 py-2 border border-gray-300">{designation.designation}</td>
+                    {designations.map((designation) => (
+                        <tr key={designation.Desig_ID}>
+                            <td className="px-4 py-2 border border-gray-300">{designation.Department_ID}</td>
+                            <td className="px-4 py-2 border border-gray-300">{designation.Name}</td>
                             <td className="px-4 py-2 border border-gray-300">
-                                <button onClick={() => handleEdit(designation.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
+                                <button onClick={() => handleEdit(designation.Desig_ID)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
                             </td>
                             <td className="px-4 py-2 border border-gray-300">
-                                <button onClick={() => handleDelete(designation.id)} className="px-3 py-1 text-white bg-red-500 rounded-md">Delete</button>
+                                <button onClick={() => handleDelete(designation.Desig_ID)} className="px-3 py-1 text-white bg-red-500 rounded-md">Delete</button>
                             </td>
                         </tr>
                     ))}
