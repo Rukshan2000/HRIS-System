@@ -4,7 +4,7 @@ const Employee = () => {
     const [employees, setEmployees] = useState([
         {
             id: 1,
-            fullName: 'John Doe',
+            fullName: 'John Doee',
             department: 'Department A',
             designation: 'Manager',
             employmentStartDate: '2024-05-01',
