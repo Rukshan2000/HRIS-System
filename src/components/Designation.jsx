@@ -53,12 +53,12 @@ const Designation = () => {
         e.preventDefault();
         if (formData.id) {
             const updatedData = {
-                department: formData.department,
-                designation: formData.designation,
-                Base_Salary: formData.Base_Salary,
+                name: formData.designation,
+                baseSalary: formData.Base_Salary,
+                departmentId: formData.department,
             };
             console.log(updatedData); // Add this line to log updatedData before PUT request
-
+         
             axios.put(`http://localhost:8081/api/designation/${formData.id}`, updatedData)
                 .then(response => {
                     console.log('Designation updated successfully:', response.data);
@@ -97,10 +97,26 @@ const Designation = () => {
 
     // Function to handle adding a new department
     const handleAddDepartment = () => {
-        if (newDepartment && !departments.includes(newDepartment)) {
-            setDepartments([...departments, newDepartment]);
+        // if (newDepartment && !departments.includes(newDepartment)) {
+        //     setNewDepartment('');
+        // }
+        
+        console.log('new department', newDepartment);
+
+      const newData = {
+        name: newDepartment
+      }
+        // Add new department
+        axios.post('http://localhost:8081/api/department', newData)
+        .then(response => {
+            // Assuming the addition was successful, you might want to update the state or handle the response accordingly
             setNewDepartment('');
-        }
+            window.location.reload(); // Reloading the page after successful addition
+        })
+        .catch(error => {
+            console.error('Error adding new designation:', error);
+        });
+
     };
 
     // Function to handle edit button click// Function to handle edit button click
