@@ -4,27 +4,25 @@ import axios from 'axios';
 const Designation = () => {
     // State for departments
     const [departments, setDepartments] = useState([]);
-
     // State for designations
     const [designations, setDesignations] = useState([]);
-
+    // Form data state
     // Form data state
     const [formData, setFormData] = useState({
         id: 0,
-        department: '',
-        designation: '',
-        basicSalary: '',
+        department: '', // Ensure that department is initialized to an empty string
+        designation: '', // Ensure that designation is initialized to an empty string
+        Base_Salary: '', // Ensure that Base_Salary is initialized to an empty string
     });
+
 
     // New department state
     const [newDepartment, setNewDepartment] = useState('');
-
     // Filter state
     const [filters, setFilters] = useState({
         department: '',
         designation: ''
     });
-
     // Toggle add/edit form visibility
     const [showForm, setShowForm] = useState(false);
     const toggleForm = () => setShowForm(!showForm);
@@ -36,6 +34,7 @@ const Designation = () => {
             ...formData,
             [name]: value,
         });
+        console.log(formData); // Add this line to log formData
     };
 
     // Function to handle new department input change
@@ -53,25 +52,48 @@ const Designation = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (formData.id) {
-            // Update existing designation
-            const updatedDesignations = designations.map((item) =>
-                item.id === formData.id ? formData : item
-            );
-            setDesignations(updatedDesignations);
+            const updatedData = {
+                department: formData.department,
+                designation: formData.designation,
+                Base_Salary: formData.Base_Salary,
+            };
+            console.log(updatedData); // Add this line to log updatedData before PUT request
+
+            axios.put(`http://localhost:8081/api/designation/${formData.id}`, updatedData)
+                .then(response => {
+                    console.log('Designation updated successfully:', response.data);
+                    window.location.reload(); // Reload the page to reflect changes
+                })
+                .catch(error => {
+                    console.error('Error updating designation:', error);
+                });
+
         } else {
             // Add new designation
-            setDesignations([...designations, { ...formData, id: Date.now() }]);
+            axios.post('http://localhost:8081/api/designation', formData)
+                .then(response => {
+                    // Assuming the addition was successful, you might want to update the state or handle the response accordingly
+                    console.log("New designation added:", response.data);
+                    window.location.reload(); // Reloading the page after successful addition
+                })
+                .catch(error => {
+                    console.error('Error adding new designation:', error);
+                });
         }
-        // Reset form data
+        // Reset form data// Reset form data to initial state
         setFormData({
-            id: '',
-            department: '',
-            designation: '',
-            basicSalary: '',
+            id: 0,
+            department: '', // Ensure that department is initialized to an empty string
+            designation: '', // Ensure that designation is initialized to an empty string
+            Base_Salary: '', // Ensure that Base_Salary is initialized to an empty string
         });
+
         // Close the form
         setShowForm(false);
     };
+
+
+
 
     // Function to handle adding a new department
     const handleAddDepartment = () => {
@@ -81,23 +103,20 @@ const Designation = () => {
         }
     };
 
-    // Function to handle edit button click
-    const handleEdit = (id) => {
-        axios.get(`http://localhost:8081/api/designation/${id}`)
-            .then(res => {
-                const data = res.data;
-                setFormData({
-                    id: data.Desig_ID,
-                    department: data.Department_ID,
-                    designation: data.Name,
-                    basicSalary: data.Base_Salary,
-                });
-                setShowForm(true);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    // Function to handle edit button click// Function to handle edit button click
+    const handleEdit = (designation) => {
+        setFormData({
+            id: designation.Desig_ID, // Corrected property name
+            department: designation.Department_ID, // Corrected property name
+            designation: designation.Name, // Corrected property name
+            Base_Salary: designation.Base_Salary,
+        });
+        setShowForm(true);
+
+
+
     };
+
 
     // Function to handle delete button click
     const handleDelete = async (id) => {
@@ -124,6 +143,12 @@ const Designation = () => {
                 console.error('Error:', error);
             });
     }, []);
+
+    // Function to get department name by department ID
+    const getDepartmentName = (departmentID) => {
+        const department = departments.find(dept => dept.Dept_ID === departmentID);
+        return department ? department.Name : '';
+    };
 
     return (
         <div className="container flex flex-col items-start mx-auto">
@@ -181,19 +206,20 @@ const Designation = () => {
                                         type="text"
                                         id="designation"
                                         name="designation"
-                                        value={formData.designation}
+                                        value={formData.designation} // Corrected property name
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                         required
                                     />
+
                                 </div>
                                 <div className="mb-4">
-                                    <label className="block mb-1 text-sm font-semibold" htmlFor="basicSalary">Basic Salary:</label>
+                                    <label className="block mb-1 text-sm font-semibold" htmlFor="Base_Salary">Basic Salary:</label>
                                     <input
                                         type="number"
-                                        id="basicSalary"
-                                        name="basicSalary"
-                                        value={formData.basicSalary}
+                                        id="Base_Salary"
+                                        name="Base_Salary"
+                                        value={formData.Base_Salary}
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                         required
@@ -214,8 +240,7 @@ const Designation = () => {
                     <input
                         type="text"
                         value={newDepartment}
-                        onChange={handleNewDepartmentChange}
-                        placeholder="New Department"
+                        onChange={handleNewDepartmentChange} placeholder="New Department"
                         className="px-3 py-2 mr-2 border border-gray-300 rounded-md"
                     />
                     <button onClick={handleAddDepartment} className="px-4 py-2 text-white bg-green-500 rounded-md">Add Department</button>
@@ -233,10 +258,10 @@ const Designation = () => {
                 <tbody>
                     {designations.map((designation) => (
                         <tr key={designation.Desig_ID}>
-                            <td className="px-4 py-2 border border-gray-300">{designation.Department_ID}</td>
+                            <td className="px-4 py-2 border border-gray-300">{getDepartmentName(designation.Department_ID)}</td>
                             <td className="px-4 py-2 border border-gray-300">{designation.Name}</td>
                             <td className="px-4 py-2 border border-gray-300">
-                                <button onClick={() => handleEdit(designation.Desig_ID)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
+                                <button onClick={() => handleEdit(designation)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
                             </td>
                             <td className="px-4 py-2 border border-gray-300">
                                 <button onClick={() => handleDelete(designation.Desig_ID)} className="px-3 py-1 text-white bg-red-500 rounded-md">Delete</button>
@@ -250,3 +275,4 @@ const Designation = () => {
 };
 
 export default Designation;
+
