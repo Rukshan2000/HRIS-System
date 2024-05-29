@@ -1,4 +1,5 @@
 // App.jsx
+
 import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
@@ -24,9 +25,6 @@ import EmployeeUpdate from './pages/EmployeeUpdate.jsx';
 import Announcement from './pages/Announcement.jsx';
 import PrivateRoutes from './utils/PrivateRoutes.js';
 import Page404 from './pages/Page404.jsx';
-
-
-
 
 const App = () => {
   return (
@@ -56,7 +54,10 @@ const App = () => {
           <Route path="/profileuser" element={<ProfileUser />} /> 
           <Route path="/taskuser" element={<TaskUser />} />
           <Route path="*" element={<Page404 />} /> 
+
         {/* </Route>  */}
+
+
 
       </Routes>
     </BrowserRouter>

@@ -1,12 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
-
-const options = [
-    { value: '1', label: 'Employee 1' },
-    { value: '2', label: 'Employee 2' },
-    // Add more options as needed
-];
 
 const generateRandomPassword = () => {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -36,6 +30,8 @@ const generateRandomPassword = () => {
     return password;
 };
 
+
+
 const AddEmployee = () => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
@@ -43,12 +39,27 @@ const AddEmployee = () => {
         password: ''
     });
     const [notification, setNotification] = useState('');
+    const [employeeOptions, setEmployeeOptions] = useState([]);
+    const [employees, setEmployees] = useState([]);
 
-    const [employees, setEmployees] = useState([
-        { id: 1, employeeId: '1', password: 'password1' },
-        { id: 2, employeeId: '2', password: 'password2' },
-        // Add more dummy data as needed
-    ]);
+    useEffect(() => {
+        axios.get('http://localhost:8081/api/employee')
+            .then(response => {
+                console.log('Response from /api/employee:', response); // Add this line
+                if (Array.isArray(response.data.data)) {
+                    const options = response.data.data.map(emp => ({
+                        value: emp.Emp_ID,
+                        label: emp.Emp_ID.toString() // Set label to employee ID
+                    }));
+                    setEmployeeOptions(options);
+                } else {
+                    console.error('Expected an array but got:', response.data.data); // Add this line
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching employee data:', error);
+            });
+    }, []);
 
     const toggleForm = () => setShowForm(!showForm);
 
@@ -91,7 +102,6 @@ const AddEmployee = () => {
     };
     
     const handleDelete = (id) => {
-        // Add logic to delete employee data
         setEmployees(employees.filter(emp => emp.id !== id));
     };
 
@@ -117,14 +127,14 @@ const AddEmployee = () => {
         document.body.removeChild(a);
     };
 
-    const saveUser = (employee)=>{
+    const saveUser = (employee) => {
         const { employeeId, password } = employee;
-        const employeeObj={username: employeeId,password: password, role: 'admin'}
-        axios.post('http://localhost:8081/api/users/',employeeObj)
-        .then(res =>{
-            console.log(res);
-        })
-        .catch(err => console.log(err));
+        const employeeObj = { username: employeeId, password: password, role: 'admin' };
+        axios.post('http://localhost:8081/api/users/', employeeObj)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => console.log(err));
     };
 
     return (
@@ -148,12 +158,12 @@ const AddEmployee = () => {
                                 <Select
                                     id="employeeId"
                                     name="employeeId"
-                                    value={options.find(option => option.value === formData.employeeId)}
+                                    value={employeeOptions.find(option => option.value === formData.employeeId)}
                                     onChange={handleSelectChange}
-                                    options={options}
+                                    options={employeeOptions}
                                     className="w-full"
                                     placeholder="Select Employee ID"
-                                    required // Make the select required
+                                    required
                                 />
                             </div>
 

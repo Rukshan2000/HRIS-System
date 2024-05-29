@@ -1,19 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import EmployeeForm from './EmployeeForm';
 
 const Employee = () => {
-    const [employees, setEmployees] = useState([
-        {
-            id: 1,
-            fullName: 'John Doee',
-            department: 'Department A',
-            designation: 'Manager',
-            employmentStartDate: '2024-05-01',
-            emergencyContactName: 'Jane Doe',
-            bloodCategory: 'A+',
-            permanentAddress: '123 Main Street, City, Country',
-        },
-        // Add more employees here
-    ]);
+    const [employees, setEmployees] = useState([]);
+    const [designations, setDesignations] = useState([]);
+    const [departments, setDepartments] = useState([]);
+    const [selectedDepartment, setSelectedDepartment] = useState('');
+    const [selectedDesignation, setSelectedDesignation] = useState('');
 
     const [formData, setFormData] = useState({
         id: '',
@@ -22,22 +15,96 @@ const Employee = () => {
         designation: '',
         employmentStartDate: '',
         emergencyContactName: '',
+        emergencyContactNumber: '',
         bloodCategory: '',
         permanentAddress: '',
         dateOfBirth: '',
-        gender: '',
+        gendername: '',
         nicNumber: '',
         primaryContactNumber: '',
         secondaryContactNumber: '',
+        shift: '',
         emailAddress: '',
     });
 
-    const [filters, setFilters] = useState({
-        department: '',
-        designation: '',
-    });
-
     const [showForm, setShowForm] = useState(false);
+
+    useEffect(() => {
+        fetchEmployees();
+        fetchDepartments();
+        fetchDesignations();
+    }, []);
+
+    const fetchDepartments = async () => {
+        try {
+            const response = await fetch('http://localhost:8081/api/department');
+            const result = await response.json();
+            if (result.success === 1 && Array.isArray(result.data)) {
+                setDepartments(result.data.map(dep => ({
+                    id: dep.Dept_ID,
+                    name: dep.Name,
+                })));
+            } else {
+                setDepartments([]);
+                console.error('Unexpected data format:', result);
+            }
+        } catch (error) {
+            console.error('Error fetching departments:', error);
+            setDepartments([]);
+        }
+    };
+
+    const fetchDesignations = async () => {
+        try {
+            const response = await fetch('http://localhost:8081/api/designation');
+            const result = await response.json();
+            if (result.success === 1 && Array.isArray(result.data)) {
+                setDesignations(result.data.map(desig => ({
+                    id: desig.Desig_ID,
+                    name: desig.Name,
+                })));
+            } else {
+                setDesignations([]);
+                console.error('Unexpected data format:', result);
+            }
+        } catch (error) {
+            console.error('Error fetching designations:', error);
+            setDesignations([]);
+        }
+    };
+
+    const fetchEmployees = async () => {
+        try {
+            const response = await fetch('http://localhost:8081/api/employee');
+            const result = await response.json();
+            if (result.success === 1 && Array.isArray(result.data)) {
+                setEmployees(result.data.map(employee => ({
+                    id: employee.Emp_ID,
+                    fullName: employee.Name,
+                    shift: employee.Shift,
+                    department: employee.Department_ID,
+                    designation: employee.Designation_ID,
+                    employmentStartDate: employee.Start_Date,
+                    emergencyContactName: employee.Emergency_Name,
+                    emergencyContactNumber: employee.Emergency_Contact,
+                    bloodCategory: employee.Blood_Type,
+                    permanentAddress: employee.Address,
+                    dateOfBirth: employee.DOB,
+                    gendername: employee.Gender,
+                    nicNumber: employee.NIC,
+                    primaryContactNumber: employee.Primary_Contact_No,
+                    secondaryContactNumber: employee.Secondary_Contact_No,
+                    emailAddress: employee.Email,
+                })));
+            } else {
+                setEmployees([]);
+                console.error('Unexpected data format:', result);
+            }
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+            setEmployees([]);
+        }
+    };
 
     const toggleForm = () => setShowForm(!showForm);
 
@@ -46,34 +113,49 @@ const Employee = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        setFilters({ ...filters, [name]: value });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const url = formData.id
+                ? `http://localhost:8081/api/employee/${formData.id}`
+                : 'http://localhost:8081/api/employee';
+
+            const method = formData.id ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                fetchEmployees();
+                resetFormDataAndToggleForm();
+            } else {
+                console.error('Failed to save employee data:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error saving employee data:', error);
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (formData.id) {
-            const updatedEmployees = employees.map((emp) =>
-                emp.id === formData.id ? formData : emp
-            );
-            setEmployees(updatedEmployees);
-        } else {
-            setEmployees([...employees, { ...formData, id: Date.now() }]);
-        }
+    const resetFormDataAndToggleForm = () => {
         setFormData({
             id: '',
             fullName: '',
-            dateOfBirth:'',
             department: '',
             designation: '',
+            shift: '',
             employmentStartDate: '',
             emergencyContactName: '',
             emergencyContactNumber: '',
             bloodCategory: '',
             permanentAddress: '',
             dateOfBirth: '',
-            gender: '',
+            gendername: '',
             nicNumber: '',
             primaryContactNumber: '',
             secondaryContactNumber: '',
@@ -88,40 +170,26 @@ const Employee = () => {
         setShowForm(true);
     };
 
-    const handleDelete = (id) => {
-        const updatedEmployees = employees.filter((emp) => emp.id !== id);
-        setEmployees(updatedEmployees);
+    const handleDelete = async (id) => {
+        try {
+            await fetch(`http://localhost:8081/api/employee/${id}`, {
+                method: 'DELETE',
+            });
+            fetchEmployees();
+        } catch (error) {
+            console.error('Error deleting employee:', error);
+        }
     };
 
-    const filteredEmployees = employees.filter((emp) => {
-        const { department, designation } = filters;
-        return (
-            emp.department.toLowerCase().includes(department.toLowerCase()) &&
-            emp.designation.toLowerCase().includes(designation.toLowerCase())
-        );
+    const filteredEmployees = employees.filter(emp => {
+        const matchesDepartment = selectedDepartment ? emp.department === parseInt(selectedDepartment) : true;
+        const matchesDesignation = selectedDesignation ? emp.designation === parseInt(selectedDesignation) : true;
+        return matchesDepartment && matchesDesignation;
     });
 
     return (
         <div className="container flex flex-col items-center mx-auto">
             <h1 className="mb-4 text-2xl font-bold">Employee</h1>
-            <div className="mb-4">
-                <input
-                    type="text"
-                    name="department"
-                    value={filters.department}
-                    onChange={handleFilterChange}
-                    placeholder="Filter by department"
-                    className="px-3 py-2 mr-2 border border-gray-300 rounded-md"
-                />
-                <input
-                    type="text"
-                    name="designation"
-                    value={filters.designation}
-                    onChange={handleFilterChange}
-                    placeholder="Filter by Designation"
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                />
-            </div>
             <button
                 onClick={toggleForm}
                 className="px-4 py-2 mb-4 text-white bg-blue-500 rounded-md"
@@ -129,261 +197,51 @@ const Employee = () => {
                 Add New
             </button>
             {showForm && (
-                <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-50">
-                    <div className="p-6 bg-white rounded-lg shadow-md">
-                        <h2 className="mb-4 text-lg font-semibold">Add/Edit Employee</h2>
-                        <div style={{ maxHeight: '500px', overflowY: 'scroll' }}>
-                        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-                            <div className="col-span-2 mb-4">
-                                <label htmlFor="fullName" className="block mb-1 text-sm font-semibold">
-                                    Full Name:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="fullName"
-                                    name="fullName"
-                                    value={formData.fullName}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="permanentAddress" className="block mb-1 text-sm font-semibold">
-                                    Permanent Address:
-                                </label>
-                                <textarea
-                                    id="permanentAddress"
-                                    name="permanentAddress"
-                                    value={formData.permanentAddress}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="dateOfBirth" className="block mb-1 text-sm font-semibold">
-                                    Date of birth:
-                                </label>
-                                <input
-                                    type="date"
-                                    id="dateOfBirth"
-                                    name="dateOfBirth"
-                                    value={formData.dateOfBirth}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="employmentStartDate" className="block mb-1 text-sm font-semibold">
-                                    Employment Start Date:
-                                </label>
-                                <input
-                                    type="date"
-                                    id="employmentStartDate"
-                                    name="employmentStartDate"
-                                    value={formData.employmentStartDate}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="emergencyContactName" className="block mb-1 text-sm font-semibold">
-                                    Emergency Contact Name:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="emergencyContactName"
-                                    name="emergencyContactName"
-                                    value={formData.emergencyContactName}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="emergencyContactNumber" className="block mb-1 text-sm font-semibold">
-                                    Emergency Contact Number:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="emergencyContactNumber"
-                                    name="emergencyContactNumber"
-                                    value={formData.emergencyContactNumber}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="bloodCategory" className="block mb-1 text-sm font-semibold">
-                                    Blood Category:
-                                </label>
-                                <select
-                                    id="bloodCategory"
-                                    name="bloodCategory"
-                                    value={formData.bloodCategory}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                >
-                                    <option value="">Select Blood Category</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="dateOfBirth" className="block mb-1 text-sm font-semibold">
-                                    Date of Birth:
-                                </label>
-                                <input
-                                    type="date"
-                                    id="dateOfBirth"
-                                    name="dateOfBirth"
-                                    value={formData.dateOfBirth}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="gender" className="block mb-1 text-sm font-semibold">
-                                    Gender:
-                                </label>
-                                <select
-                                    id="gender"
-                                    name="gender"
-                                    value={formData.gender}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="nicNumber" className="block mb-1 text-sm font-semibold">
-                                    NIC Number:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="nicNumber"
-                                    name="nicNumber"
-                                    value={formData.nicNumber}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="primaryContactNumber" className="block mb-1 text-sm font-semibold">
-                                    Primary Contact Number:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="primaryContactNumber"
-                                    name="primaryContactNumber"
-                                    value={formData.primaryContactNumber}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="secondaryContactNumber" className="block mb-1 text-sm font-semibold">
-                                    Secondary Contact Number (Optional):
-                                </label>
-                                <input
-                                    type="text"
-                                    id="secondaryContactNumber"
-                                    name="secondaryContactNumber"
-                                    value={formData.secondaryContactNumber}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="emailAddress" className="block mb-1 text-sm font-semibold">
-                                    Email Address:
-                                </label>
-                                <input
-                                    type="email"
-                                    id="emailAddress"
-                                    name="emailAddress"
-                                    value={formData.emailAddress}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            {/* Add Dropdowns for Department or team and Designation */}
-                            <div className="mb-4">
-                                <label htmlFor="departmentOrTeam" className="block mb-1 text-sm font-semibold">
-                                    Department or Team:
-                                </label>
-                                <select
-                                    id="departmentOrTeam"
-                                    name="department" // Assuming the department or team corresponds to the department
-                                    value={formData.department}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                >
-                                    <option value="">Select Department or Team</option>
-                                    {/* Add options dynamically here */}
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="designation" className="block mb-1 text-sm font-semibold">
-                                    Designation:
-                                </label>
-                                <select
-                                    id="designation"
-                                    name="designation"
-                                    value={formData.designation}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                >
-                                    <option value="">Select Designation</option>
-                                    {/* Add options dynamically here */}
-                                </select>
-                            </div>
-                            <div className="col-span-2">
-                                <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">
-                                    Save
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={toggleForm}
-                                    className="px-4 py-2 ml-2 text-white bg-gray-500 rounded-md"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                        </div>
-                    </div>
-                </div>
+                <EmployeeForm
+                    formData={formData}
+                    departments={departments}
+                    designations={designations}
+                    handleChange={handleChange}
+                    handleSubmit={handleSubmit}
+                    toggleForm={toggleForm}
+                />
             )}
             <div className="w-full">
+                <div className="mb-4">
+                    <label htmlFor="departmentFilter" className="mr-2">Filter by Department:</label>
+                    <select
+                        id="departmentFilter"
+                        value={selectedDepartment}
+                        onChange={(e) => setSelectedDepartment(e.target.value)}
+                        className="px-4 py-2 border border-gray-300 rounded-md"
+                    >
+                        <option value="">All</option>
+                        {departments.map((department) => (
+                            <option key={department.id} value={department.id}>{department.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="mb-4">
+                    <label htmlFor="designationFilter" className="mr-2">Filter by Designation:</label>
+                    <select
+                        id="designationFilter"
+                        value={selectedDesignation}
+                        onChange={(e) => setSelectedDesignation(e.target.value)}
+                        className="px-4 py-2 border border-gray-300 rounded-md"
+                    >
+                        <option value="">All</option>
+                        {designations.map((designation) => (
+                            <option key={designation.id} value={designation.id}>{designation.name}</option>
+                        ))}
+                    </select>
+                </div>
+
                 <table className="w-full border border-collapse border-gray-300">
                     <thead>
                         <tr className="bg-gray-200">
                             <th className="px-4 py-2 border border-gray-300">Emp ID</th>
                             <th className="px-4 py-2 border border-gray-300">Full Name</th>
-                            <th className="px-4 py-2 border border-gray-300">department</th>
+                            <th className="px-4 py-2 border border-gray-300">Department</th>
                             <th className="px-4 py-2 border border-gray-300">Designation</th>
                             <th className="px-4 py-2 border border-gray-300">Actions</th>
                         </tr>
@@ -393,8 +251,12 @@ const Employee = () => {
                             <tr key={emp.id}>
                                 <td className="px-4 py-2 border border-gray-300">{emp.id}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.fullName}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.department}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.designation}</td>
+                                <td className="px-4 py-2 border border-gray-300">
+                                    {departments.find(dep => dep.id === emp.department)?.name}
+                                </td>
+                                <td className="px-4 py-2 border border-gray-300">
+                                    {designations.find(desig => desig.id === emp.designation)?.name}
+                                </td>
                                 <td className="px-4 py-2 border border-gray-300">
                                     <button onClick={() => handleEdit(emp.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">
                                         Update
@@ -405,6 +267,13 @@ const Employee = () => {
                                 </td>
                             </tr>
                         ))}
+                        {filteredEmployees.length === 0 && (
+                            <tr>
+                                <td colSpan="5" className="px-4 py-2 text-center border border-gray-300">
+                                    No employees found.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
