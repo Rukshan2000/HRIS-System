@@ -122,13 +122,13 @@ const EmployeeForm = ({ formData, departments, designations, handleChange, handl
                             </select>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="gendername" className="block mb-1 text-sm font-semibold">
+                            <label htmlFor="gender" className="block mb-1 text-sm font-semibold">
                                 Gender:
                             </label>
                             <select
-                                id="gendername"
-                                name="gendername"
-                                value={formData.gendername}
+                                id="gender"
+                                name="gender"
+                                value={formData.gender}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                 required
