@@ -44,13 +44,14 @@ const Login = () => {
                 // }
                 localStorage.setItem("token",res.data.token);
                 navigate('/dashboard');
-            } else {
-                alert(res.data.Error); // Notify the user of the specific error
-            }
-            console.log(res);
+            } 
+            console.log('res',res);
+            alert(res.data.message)
         })
-        .catch(err => console.log(err));
-
+        .catch(err => {
+            console.log(err);
+            alert(err.response.data.message);
+        });
 
 
         // // Check if username and password match
