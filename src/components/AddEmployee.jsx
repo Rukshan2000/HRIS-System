@@ -36,6 +36,7 @@ const AddEmployee = () => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         employeeId: '',
+        role: 'emp',
         password: ''
     });
     const [notification, setNotification] = useState('');
@@ -43,6 +44,15 @@ const AddEmployee = () => {
     const [employees, setEmployees] = useState([]);
 
     useEffect(() => {
+        axios.get('http://localhost:8081/api/users')
+            .then(res => {
+                // console.log('Response from /api/employee:', response); // Add this line
+                setEmployees(res.data.data)
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+
         axios.get('http://localhost:8081/api/employee')
             .then(response => {
                 console.log('Response from /api/employee:', response); // Add this line
@@ -67,6 +77,10 @@ const AddEmployee = () => {
         setFormData({ ...formData, employeeId: selectedOption.value });
     };
 
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!formData.employeeId) {
@@ -77,6 +91,7 @@ const AddEmployee = () => {
         const newEmployee = {
             id: employees.length + 1,
             employeeId: formData.employeeId,
+            role: formData.role,
             password: newPassword
         };
         setEmployees([...employees, newEmployee]);
@@ -87,23 +102,40 @@ const AddEmployee = () => {
     };
 
     const handleUpdate = (id) => {
-        const employeeToUpdate = employees.find(emp => emp.id === id);
         const newPassword = generateRandomPassword();
-        
+        const data = {
+            password: newPassword
+        }
         // Update employee's password
-        const updatedEmployees = employees.map(emp =>
-            emp.id === id ? { ...emp, password: newPassword } : emp
-        );
-        setEmployees(updatedEmployees);
-    
-        // Download updated credentials
-        const updatedEmployee = { ...employeeToUpdate, password: newPassword };
-        downloadCredentials(updatedEmployee);
+        // const updatedEmployees = employees.map(emp =>
+        //     emp.id === id ? { ...emp, password: newPassword } : emp
+        // );
+        // setEmployees(updatedEmployees);
+        try {
+            axios.patch(`http://localhost:8081/api/users/${id}`, data)
+                .then(res => {
+                    console.log(res.data);
+                    // Download updated credentials
+                    const updatedEmployee = { employeeId: id, password: newPassword };
+                    downloadCredentials(updatedEmployee);
+
+                })
+        } catch (error) {
+            console.log('update error', error)
+        }
+
     };
-    
-    const handleDelete = (id) => {
-        setEmployees(employees.filter(emp => emp.id !== id));
+
+    // Function to handle delete button click
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`http://localhost:8081/api/users/${id}`);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error deleting designation:', error);
+        }
     };
+
 
     const handleCopyPassword = (password) => {
         navigator.clipboard.writeText(password);
@@ -128,8 +160,8 @@ const AddEmployee = () => {
     };
 
     const saveUser = (employee) => {
-        const { employeeId, password } = employee;
-        const employeeObj = { username: employeeId, password: password, role: 'admin' };
+        const { employeeId, password, role } = employee;
+        const employeeObj = { username: employeeId, password: password, role: role };
         axios.post('http://localhost:8081/api/users/', employeeObj)
             .then(res => {
                 console.log(res);
@@ -138,10 +170,10 @@ const AddEmployee = () => {
     };
 
     return (
-        <div className="relative">
+        <div className=" p-10">
             <button
                 onClick={toggleForm}
-                className="absolute top-0 right-0 px-4 py-2 mr-4 text-white bg-blue-500 rounded-md"
+                className="float-end px-4 py-2 mr-4 text-white bg-blue-500 rounded-md"
             >
                 Add New
             </button>
@@ -167,6 +199,23 @@ const AddEmployee = () => {
                                 />
                             </div>
 
+                            <div className="mb-4">
+                                <label htmlFor="role" className="block mb-1 text-sm font-semibold">
+                                    Blood Category:
+                                </label>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={formData.role}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    required
+                                >
+                                    <option value="emp">Employer</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+
                             <div className="flex justify-between">
                                 <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
                                 <button type="button" onClick={toggleForm} className="px-4 py-2 text-white bg-gray-500 rounded-md">Cancel</button>
@@ -181,16 +230,18 @@ const AddEmployee = () => {
                     <thead>
                         <tr>
                             <th className="px-4 py-2 border">Employee ID</th>
+                            <th className="px-4 py-2 border">Role</th>
                             <th className="px-4 py-2 border">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {employees.map(employee => (
-                            <tr key={employee.id}>
-                                <td className="px-4 py-2 border">{employee.employeeId}</td>
+                            <tr key={employee.Emp_Id}>
+                                <td className="px-4 py-2 border">{employee.Emp_ID}</td>
+                                <td className="px-4 py-2 border">{employee.role}</td>
                                 <td className="px-4 py-2 border">
-                                    <button onClick={() => handleUpdate(employee.id)} className="px-3 py-1 mr-2 text-white bg-green-500 rounded-md">Reset</button>
-                                    <button onClick={() => handleDelete(employee.id)} className="px-3 py-1 text-white bg-red-500 rounded-md">Delete</button>
+                                    <button onClick={() => handleUpdate(employee.Emp_ID)} className="px-3 py-1 mr-2 text-white bg-green-500 rounded-md">Reset</button>
+                                    <button onClick={() => handleDelete(employee.Emp_ID)} className="px-3 py-1 text-white bg-red-500 rounded-md">Delete</button>
                                 </td>
                             </tr>
                         ))}
