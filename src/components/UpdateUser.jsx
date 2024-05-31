@@ -6,10 +6,8 @@ const UpdateUser = () => {
     const [formData, setFormData] = useState({
         employeeId: '',
         empName: '',
-        designation: '',
         salary: '',
-        shift: '',
-        role: ''
+        allowance: ''
     });
 
     // State for success message
@@ -20,18 +18,19 @@ const UpdateUser = () => {
 
     // State for storing employee data
     const [dummyEmployees, setDummyEmployees] = useState([
-        { id: 1, employeeId: 'EMP001', empName: 'John Doe', designation: 'Manager', salary: '2000', shift: 'Night', role: 'Admin' },
-        { id: 2, employeeId: 'EMP002', empName: 'Jane Smith', designation: 'Supervisor', salary: '1200', shift: 'Day', role: 'Employee' },
-        { id: 3, employeeId: 'EMP003', empName: 'Alice Johnson', designation: 'Manager', salary: '2000', shift: 'Night', role: 'Admin' },
-        { id: 4, employeeId: 'EMP004', empName: 'Bob Brown', designation: 'Supervisor', salary: '1200', shift: 'Day', role: 'Employee' },
-        { id: 5, employeeId: 'EMP005', empName: 'Emma Wilson', designation: 'Manager', salary: '2000', shift: 'Night', role: 'Admin' },
-        { id: 6, employeeId: 'EMP006', empName: 'James Davis', designation: 'Supervisor', salary: '1200', shift: 'Day', role: 'Employee' },
-        { id: 7, employeeId: 'EMP007', empName: 'Sarah Miller', designation: 'Manager', salary: '2000', shift: 'Night', role: 'Admin' },
-        { id: 8, employeeId: 'EMP008', empName: 'Michael Thompson', designation: 'Supervisor', salary: '1200', shift: 'Day', role: 'Employee' },
-        { id: 9, employeeId: 'EMP009', empName: 'Olivia Martinez', designation: 'Manager', salary: '2000', shift: 'Night', role: 'Admin' },
-        { id: 10, employeeId: 'EMP010', empName: 'David Garcia', designation: 'Supervisor', salary: '1200', shift: 'Day', role: 'Employee' },
-        
-    ]);
+        { id: 1, employeeId: '1', empName: 'John Doe', designation: 'Manager', salary: '2000', allowance: '500' },
+        { id: 2, employeeId: '2', empName: 'Jane Smith', designation: 'Supervisor', salary: '2500', allowance: '600' },
+        { id: 3, employeeId: '3', empName: 'Alice Johnson', designation: 'Manager', salary: '1800', allowance: '400' },
+        { id: 4, employeeId: '4', empName: 'Bob Brown', designation: 'Supervisor', salary: '2100', allowance: '450' },
+        { id: 5, employeeId: '5', empName: 'Emma Wilson', designation: 'Manager', salary: '2200', allowance: '550' },
+        { id: 6, employeeId: '6', empName: 'James Davis', designation: 'Supervisor', salary: '1900', allowance: '470' },
+        { id: 7, employeeId: '7', empName: 'Sarah Miller', designation: 'Manager', salary: '2400', allowance: '520' },
+        { id: 8, employeeId: '8', empName: 'Michael Thompson', designation: 'Supervisor', salary: '2000', allowance: '480' },
+        { id: 9, employeeId: '9', empName: 'Olivia Martinez', designation: 'Manager', salary: '2300', allowance: '530' },
+        { id: 10, employeeId: '10', empName: 'David Garcia', designation: 'Supervisor', salary: '1950', allowance: '470' }
+    ]
+    
+    );
 
     // State for pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -75,26 +74,6 @@ const UpdateUser = () => {
         setShowPopup(false);
     };
 
-    // Dummy data for options
-    const dummyDesignations = [
-        { value: 'Manager', label: 'Manager' },
-        { value: 'Supervisor', label: 'Supervisor' },
-        { value: 'Team Lead', label: 'Team Lead' },
-        // Add more dummy designations
-    ];
-
-    const dummyShifts = [
-        { value: 'Day', label: 'Day' },
-        { value: 'Night', label: 'Night' },
-        // Add more dummy shifts
-    ];
-
-    const dummyRoles = [
-        { value: 'Admin', label: 'Admin' },
-        { value: 'Employee', label: 'Employee' },
-        // Add more dummy roles
-    ];
-
     // Function to handle opening the popup form
     const handleOpenPopup = (employeeId) => {
         const employee = dummyEmployees.find(emp => emp.employeeId === employeeId);
@@ -128,6 +107,11 @@ const UpdateUser = () => {
     const handleEmployeeIdFilterChange = (e) => {
         setEmployeeIdFilter(e.target.value);
         setCurrentPage(1); // Reset pagination to first page when filter changes
+    };
+
+    // Function to handle canceling the form submission
+    const handleCancel = () => {
+        setShowPopup(false);
     };
 
     return (
@@ -167,7 +151,7 @@ const UpdateUser = () => {
                                 </div>
                             </div>
                             <div className="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button onClick={() => setSuccessMessage('')} type="button" className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                <button onClick={() => setSuccessMessage('')} type="button" className="w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm inline-flexjustify-center hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                                     Close
                                 </button>
                             </div>
@@ -182,8 +166,7 @@ const UpdateUser = () => {
                         <th className="px-4 py-2 border">Employee Name</th>
                         <th className="px-4 py-2 border">Designation</th>
                         <th className="px-4 py-2 border">Salary</th>
-                        <th className="px-4 py-2 border">Shift</th>
-                        <th className="px-4 py-2 border">Role</th>
+                        <th className="px-4 py-2 border">Allowance</th>
                         <th className="px-4 py-2 border">Actions</th>
                     </tr>
                 </thead>
@@ -194,8 +177,7 @@ const UpdateUser = () => {
                             <td className="px-4 py-2 border">{employee.empName}</td>
                             <td className="px-4 py-2 border">{employee.designation}</td>
                             <td className="px-4 py-2 border">{employee.salary}</td>
-                            <td className="px-4 py-2 border">{employee.shift}</td>
-                            <td className="px-4 py-2 border">{employee.role}</td>
+                            <td className="px-4 py-2 border">{employee.allowance}</td>
                             <td className="px-4 py-2 border">
                                 <button onClick={() => handleOpenPopup(employee.employeeId)} className="px-4 py-2 text-white bg-blue-500 rounded-md">Update</button>
                             </td>
@@ -220,16 +202,6 @@ const UpdateUser = () => {
                             <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                                 <h2 className="mb-4 text-lg font-semibold">Update User</h2>
                                 <form onSubmit={handleSubmit}>
-
-
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700">Designation</label>
-                                        <Select
-                                            value={{ value: formData.designation, label: formData.designation }}
-                                            options={dummyDesignations}
-                                            onChange={(selectedOption) => handleSelectChange(selectedOption, 'designation')}
-                                        />
-                                    </div>
                                     <div className="mb-4">
                                         <label className="block text-sm font-medium text-gray-700">Salary</label>
                                         <input
@@ -241,23 +213,18 @@ const UpdateUser = () => {
                                         />
                                     </div>
                                     <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700">Shift</label>
-                                        <Select
-                                            value={{ value: formData.shift, label: formData.shift }}
-                                            options={dummyShifts}
-                                            onChange={(selectedOption) => handleSelectChange(selectedOption, 'shift')}
+                                        <label className="block text-sm font-medium text-gray-700">Allowance</label>
+                                        <input
+                                            type="text"
+                                            value={formData.allowance}
+                                            onChange={handleChange}
+                                            name="allowance"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                         />
                                     </div>
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700">Role</label>
-                                        <Select
-                                            value={{ value: formData.role, label: formData.role }}
-                                            options={dummyRoles}
-                                            onChange={(selectedOption) => handleSelectChange(selectedOption, 'role')}
-                                        />
-                                    </div>
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-between">
                                         <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Update</button>
+                                        <button type="button" onClick={handleCancel} className="px-4 py-2 text-white bg-gray-500 rounded-md">Cancel</button>
                                     </div>
                                 </form>
                             </div>
@@ -270,3 +237,4 @@ const UpdateUser = () => {
 };
 
 export default UpdateUser;
+

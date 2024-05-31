@@ -1,37 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const DisplayAnn = () => {
-  // Sample announcement data (you can replace it with actual data from the backend)
-  const announcements = [
-    {
-      id: 1,
-      title: 'Important Announcement',
-      body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere sapien sed arcu elementum commodo.',
-      from: 'Admin'
-    },
-    {
-      id: 2,
-      title: 'Reminder: Team Meeting',
-      body: 'Nam vitae urna vel velit feugiat congue. Sed vestibulum urna at justo vestibulum, id semper nisl malesuada.',
-      from: 'Manager'
-    },
-    // Add more announcement objects here if needed
-  ];
+const Announcements = () => {
+  const [announcements, setAnnouncements] = useState([]);
+
+  useEffect(() => {
+    // Fetch announcements when the component mounts
+    fetchAnnouncements();
+  }, []);
+
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/announsment'); // Replace '/api/announcements' with your backend API endpoint
+      setAnnouncements(response.data.data); // Assuming the API response has a 'data' property containing the announcements
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+    }
+  };
 
   return (
-    <div className="container px-4 py-8 mx-auto lg:px-8">
-      <h2 className="mb-8 text-3xl font-bold">Announcements</h2>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {announcements.map((announcement) => (
-          <div key={announcement.id} className="p-6 bg-white rounded-lg shadow-md">
-            <h3 className="mb-2 text-xl font-semibold">{announcement.title}</h3>
-            <p className="mb-4 text-gray-700">{announcement.body}</p>
-            <p className="text-gray-500">From: {announcement.from}</p>
-          </div>
+    <div>
+      <h1>Announcements</h1>
+      <ul>
+        {announcements.map(announcement => (
+          <li key={announcement.id}>
+            <h2>{announcement.title}</h2>
+            <p>{announcement.body}</p>
+            <p>From: {announcement.from}</p>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
 
-export default DisplayAnn;
+export default Announcements;

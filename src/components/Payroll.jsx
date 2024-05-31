@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 const Payroll = () => {
     const [employees, setEmployees] = useState([
-        { id: 1, department: 'department A', otHours: 5, noPayLeaves: 2, taxPercentage: 5, epf: 200, etf: 100, allowance: 100, salary: 2000 },
-        { id: 2, department: 'department B', otHours: 3, noPayLeaves: 1, taxPercentage: 3, epf: 150, etf: 80, allowance: 150, salary: 2500 },
-        { id: 3, department: 'department C', otHours: 1, noPayLeaves: 1, taxPercentage: 10, epf: 100, etf: 200, allowance: 100, salary: 10000 },
+        { id: 1, department: 'department A', otHours: 5, noPayLeaves: 2, allowance: 100, salary: 200000 },
+        { id: 2, department: 'department B', otHours: 3, noPayLeaves: 1, allowance: 150, salary: 250000 },
+        { id: 3, department: 'department C', otHours: 1, noPayLeaves: 1, allowance: 100, salary: 100000 },
         // Add more employees here
     ]);
 
@@ -13,9 +13,6 @@ const Payroll = () => {
         department: '',
         otHours: '',
         noPayLeaves: '',
-        taxPercentage: '',
-        epf: '',
-        etf: '',
         allowance: '',
         salary: ''
     });
@@ -48,7 +45,7 @@ const Payroll = () => {
         } else {
             setEmployees([...employees, { ...formData, id: Date.now() }]);
         }
-        setFormData({ id: '', department: '', otHours: '', noPayLeaves: '', taxPercentage: '', epf: '', etf: '', allowance: '', salary: '' });
+        setFormData({ id: '', department: '', otHours: '', noPayLeaves: '', allowance: '', salary: '' });
         setShowForm(false);
     };
 
@@ -64,31 +61,64 @@ const Payroll = () => {
     };
 
     const handleGenerate = (id) => {
+        
         const updatedEmployees = employees.map((emp) => {
             if (emp.id === id) {
-                const otHourlyRate = parseInt(emp.salary) / 720;
-                const noPayDeduction = parseInt(emp.salary) / 30;
-                
-                const totalOT = parseInt(emp.otHours) * otHourlyRate;
-                const totalNPLeaves = parseInt(emp.noPayLeaves) * noPayDeduction;
-                const totalSalary = parseInt(emp.salary) + totalOT - totalNPLeaves;
-                const totalAllowance = parseInt(emp.allowance);
-                const totalEPF = parseInt(emp.epf);
-                const totalETF = parseInt(emp.etf);
-                const total = totalSalary + totalAllowance - totalEPF - totalETF;
-                const taxPercentage = parseInt(emp.taxPercentage);
-                const tax = (total * taxPercentage) / 100;
-                const totalIncome = total - tax;
+                const otHourlyRate = parseFloat(emp.salary) / 176;
+                const noPayDeduction = parseFloat(emp.salary) / 22;
+    
+                const totalOT = parseFloat(emp.otHours) * otHourlyRate;
+                const totalNPLeaves = parseFloat(emp.noPayLeaves) * noPayDeduction;
+                const totalSalary = parseFloat(emp.salary) + totalOT - totalNPLeaves;
+                const totalAllowance = parseFloat(emp.allowance);
+    
+                // Tax calculation
+                const annualSalary = parseFloat(emp.salary) * 12;
+                let tax = 0;
+    
+                if (annualSalary <= 1200000) {
+                    tax = 0;
+                } else if (annualSalary <= 2000000) {
+                    tax = 2500;
+                } else if (annualSalary <= 2500000) {
+                    tax = 5000;
+                } else if (annualSalary <= 3000000) {
+                    tax = 7500;
+                } else if (annualSalary <= 3500000) {
+                    tax = 10000;
+                } else if (annualSalary <= 4000000) {
+                    tax = 12500;
+                } else {
+                    tax = 69000 + (annualSalary - 4200000) * 0.36;
+                }
+    
+                // EPF and ETF calculation
+                const employeeEPFContribution = parseFloat(emp.salary) * 0.08;
+                const employerEPFContribution = parseFloat(emp.salary) * 0.12;
+                const employerETFContribution = parseFloat(emp.salary) * 0.03;
+                const totalEmployerContribution = employerEPFContribution + employerETFContribution;
+                const totalEPFs = employeeEPFContribution + employerEPFContribution;
+                const totalETF = employerETFContribution;
+    
+                // Deduct EPF, ETF, tax, and allowance contributions from total income
+                const totalIncome = (totalSalary + totalAllowance - tax - totalEPFs - totalETF).toFixed(2);
     
                 return {
                     ...emp,
-                    totalIncome: totalIncome
+                    totalIncome: totalIncome,
+                    totalETF: totalETF.toFixed(2),
+                    totalEPF: totalEPFs.toFixed(2),
+                    totalTax: tax.toFixed(2)
                 };
             }
             return emp;
         });
         setEmployees(updatedEmployees);
     };
+    
+
+
+
 
     const filteredEmployees = employees.filter((emp) => {
         const { department } = filters;
@@ -132,90 +162,7 @@ const Payroll = () => {
                                     readOnly
                                 />
                             </div>
-                            <div className="mb-4">
-                                <label htmlFor="department" className="block mb-1 text-sm font-semibold">Department:</label>
-                                <input
-                                    type="text"
-                                    id="department"
-                                    name="department"
-                                    value={formData.department}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="allowance" className="block mb-1 text-sm font-semibold">Allowance:</label>
-                                <input
-                                    type="number"
-                                    id="allowance"
-                                    name="allowance"
-                                    value={formData.allowance}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="otHours" className="block mb-1 text-sm font-semibold">OT hours:</label>
-                                <input
-                                    type="number"
-                                    id="otHours"
-                                    name="otHours"
-                                    value={formData.otHours}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="noPayLeaves" className="block mb-1 text-sm font-semibold">No Pay Leaves:</label>
-                                <input
-                                    type="number"
-                                    id="noPayLeaves"
-                                    name="noPayLeaves"
-                                    value={formData.noPayLeaves}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="taxPercentage" className="block mb-1 text-sm font-semibold">Tax Percentage:</label>
-                                <input
-                                    type="number"
-                                    id="taxPercentage"
-                                    name="taxPercentage"
-                                    value={formData.taxPercentage}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="epf" className="block mb-1 text-sm font-semibold">EPF:</label>
-                                <input
-                                    type="number"
-                                    id="epf"
-                                    name="epf"
-                                    value={formData.epf}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="etf" className="block mb-1 text-sm font-semibold">ETF:</label>
-                                <input
-                                    type="number"
-                                    id="etf"
-                                    name="etf"
-                                    value={formData.etf}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
+
                             <div className="flex items-center justify-between col-span-2">
                                 <div>
                                     <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">Save</button>
@@ -232,15 +179,11 @@ const Payroll = () => {
                         <tr className="bg-gray-200">
                             <th className="px-4 py-2 border border-gray-300">Emp ID</th>
                             <th className="px-4 py-2 border border-gray-300">Department</th>
-                            <th className="px-4 py-2 border border-gray-300">OT hours</th>
-                            <th className="px-4 py-2 border border-gray-300">No Pay Leaves</th>
-                            <th className="px-4 py-2 border border-gray-300">Tax Percentage</th>
-                            <th className="px-4 py-2 border border-gray-300">EPF</th>
-                            <th className="px-4 py-2 border border-gray-300">ETF</th>
-                            <th className="px-4 py-2 border border-gray-300">Allowance</th>
                             <th className="px-4 py-2 border border-gray-300">Salary</th>
+                            <th className="px-4 py-2 border border-gray-300">Total ETF</th>
+                            <th className="px-4 py-2 border border-gray-300">Total EPF</th>
+                            <th className="px-4 py-2 border border-gray-300">Total Tax</th>
                             <th className="px-4 py-2 border border-gray-300">Total Income</th>
-                            <th className="px-4 py-2 border border-gray-300">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -248,16 +191,12 @@ const Payroll = () => {
                             <tr key={emp.id}>
                                 <td className="px-4 py-2 border border-gray-300">{emp.id}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.department}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.otHours}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.noPayLeaves}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.taxPercentage}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.epf}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.etf}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.allowance}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.salary}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.totalETF}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.totalEPF}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.totalTax}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.totalIncome}</td>
                                 <td className="px-4 py-2 border border-gray-300">
-                                    <button onClick={() => handleEdit(emp.id)} className="px-3 py-1 text-white bg-blue-500 rounded-md">Update</button>
                                     <button onClick={() => handleDelete(emp.id)} className="px-3 py-1 ml-2 text-white bg-red-500 rounded-md">Delete</button>
                                     <button type="button" onClick={() => handleGenerate(emp.id)} className="px-3 py-1 ml-2 text-white bg-green-500 rounded-md">Generate</button>
                                 </td>

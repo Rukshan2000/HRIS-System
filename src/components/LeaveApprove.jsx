@@ -1,50 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const LeaveApprove = () => {
-    // Dummy data for leave requests
+    const [leaveRequests, setLeaveRequests] = useState([]);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [selectedRequestId, setSelectedRequestId] = useState(null);
     const [closedCards, setClosedCards] = useState([]);
 
-    const leaveRequests = [
-        {
-            id: 1,
-            employeeName: "John Doe",
-            employeeId: "EMP001",
-            leaveType: "Annual Leave",
-            reason: "Family vacation",
-            fromDate: "2024-05-10",
-            toDate: "2024-05-15"
-        },
-        {
-            id: 2,
-            employeeName: "Alice Smith",
-            employeeId: "EMP002",
-            leaveType: "Sick Leave",
-            reason: "Fever",
-            fromDate: "2024-06-01",
-            toDate: "2024-06-03"
-        },
-        // Add more leave requests here
-    ];
+    useEffect(() => {
+        // Fetch leave requests from the backend
+        axios.get('http://localhost:8081/api/leave')
+            .then(response => {
+                setLeaveRequests(response.data.data);
+            })
+            .catch(error => {
+                console.error("There was an error fetching the leave requests!", error);
+            });
+    }, []);
+
+    const updateLeaveStatus = (id, status, data) => {
+        console.log("Updating leave request with ID:", id, "to status:", status);
+        console.log("Data:", data);
+        axios.put(`http://localhost:8081/api/leave/${id}`, { status, ...data })
+            .then(response => {
+                setLeaveRequests(prevRequests =>
+                    prevRequests.map(request =>
+                        request.Leave_ID === id ? { ...request, Statuss: status } : request
+                    )
+                );
+                setSelectedRequestId(id);
+                setShowSuccessPopup(true);
+                setClosedCards([...closedCards, id]);
+                console.log(`Leave request with ID ${id} ${status}.`);
+            })
+            .catch(error => {
+                console.error(`There was an error updating the leave request with ID ${id}!`, error);
+            });
+    };
+
+
+
 
     // Function to handle leave approval
-    const handleApprove = (id) => {
-        // Logic to approve leave request
-        setSelectedRequestId(id);
-        setShowSuccessPopup(true);
-        setClosedCards([...closedCards, id]);
-        console.log(`Leave request with ID ${id} approved.`);
+    const handleApprove = (id, data) => {
+        console.log("Approve button clicked with ID:", id);
+        console.log("Data:", data);
+        updateLeaveStatus(id, 'approved', data);
     };
 
     // Function to handle leave rejection
-    const handleReject = (id) => {
-        // Logic to reject leave request
-        setSelectedRequestId(id);
-        setShowSuccessPopup(true);
-        setClosedCards([...closedCards, id]);
-        console.log(`Leave request with ID ${id} rejected.`);
+    const handleReject = (id, data) => {
+        console.log("Reject button clicked with ID:", id);
+        console.log("Data:", data);
+        updateLeaveStatus(id, 'rejected', data);
     };
+
 
     const handleCloseSuccessPopup = () => {
         setShowSuccessPopup(false);
@@ -55,17 +65,18 @@ const LeaveApprove = () => {
         <div className="container px-4 py-8 mx-auto">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1">
                 {leaveRequests.map((request) => (
-                    !closedCards.includes(request.id) && (
-                        <div key={request.id} className="overflow-hidden bg-white rounded-lg shadow-md" style={{ minWidth: '800px' }}>
+                    !closedCards.includes(request.Leave_ID) && (
+                        <div key={request.Leave_ID} className="overflow-hidden bg-white rounded-lg shadow-md" style={{ minWidth: '800px' }}>
                             <div className="p-6 space-y-4">
                                 <h2 className="text-lg font-semibold">{request.employeeName}</h2>
-                                <p className="text-sm text-gray-600">Employee ID: {request.employeeId}</p>
-                                <p className="text-sm text-gray-600">Leave Type: {request.leaveType}</p>
-                                <p className="text-sm text-gray-600">Reason: {request.reason}</p>
-                                <p className="text-sm text-gray-600">From: {request.fromDate} - To: {request.toDate}</p>
+                                <p className="text-sm text-gray-600">Leave ID: {request.Leave_ID}</p>
+                                <p className="text-sm text-gray-600">Leave Type: {request.Leave_Type}</p>
+                                <p className="text-sm text-gray-600">Reason: {request.Reason}</p>
+                                <p className="text-sm text-gray-600">From: {request.Start_Date} - To: {request.End_Date}</p>
                                 <div className="flex justify-end space-x-4">
-                                    <button onClick={() => handleApprove(request.id)} className="px-4 py-2 text-white bg-gray-800 rounded-md">Approve</button>
-                                    <button onClick={() => handleReject(request.id)} className="px-4 py-2 text-black bg-gray-300 rounded-md">Reject</button>
+                                    <button onClick={() => handleApprove(request.Leave_ID, request)} className="px-4 py-2 text-white bg-gray-800 rounded-md">Approve</button>
+                                    <button onClick={() => handleReject(request.Leave_ID, request)} className="px-4 py-2 text-black bg-gray-300 rounded-md">Reject</button>
+
                                 </div>
                             </div>
                         </div>
