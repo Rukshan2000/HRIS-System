@@ -18,11 +18,11 @@ const LeaveApprove = () => {
             });
     }, []);
 
-    const updateLeaveStatus = (id, status, data) => {
-        console.log("Updating leave request with ID:", id, "to status:", status);
-        console.log("Data:", data);
-        axios.put(`http://localhost:8081/api/leave/${id}`, { status, ...data })
+    const updateLeaveStatus = (id, status) => {
+       const newData ={status: status}
+        axios.patch(`http://localhost:8081/api/leave/${id}`, newData)
             .then(response => {
+                // console.log(response.data);
                 setLeaveRequests(prevRequests =>
                     prevRequests.map(request =>
                         request.Leave_ID === id ? { ...request, Statuss: status } : request
@@ -31,7 +31,7 @@ const LeaveApprove = () => {
                 setSelectedRequestId(id);
                 setShowSuccessPopup(true);
                 setClosedCards([...closedCards, id]);
-                console.log(`Leave request with ID ${id} ${status}.`);
+                // console.log(`Leave request with ID ${id} ${status}.`);
             })
             .catch(error => {
                 console.error(`There was an error updating the leave request with ID ${id}!`, error);
@@ -42,17 +42,13 @@ const LeaveApprove = () => {
 
 
     // Function to handle leave approval
-    const handleApprove = (id, data) => {
-        console.log("Approve button clicked with ID:", id);
-        console.log("Data:", data);
-        updateLeaveStatus(id, 'approved', data);
+    const handleApprove = (id) => {
+        updateLeaveStatus(id, 'approved');
     };
 
     // Function to handle leave rejection
-    const handleReject = (id, data) => {
-        console.log("Reject button clicked with ID:", id);
-        console.log("Data:", data);
-        updateLeaveStatus(id, 'rejected', data);
+    const handleReject = (id) => {
+        updateLeaveStatus(id, 'rejected');
     };
 
 
@@ -74,8 +70,8 @@ const LeaveApprove = () => {
                                 <p className="text-sm text-gray-600">Reason: {request.Reason}</p>
                                 <p className="text-sm text-gray-600">From: {request.Start_Date} - To: {request.End_Date}</p>
                                 <div className="flex justify-end space-x-4">
-                                    <button onClick={() => handleApprove(request.Leave_ID, request)} className="px-4 py-2 text-white bg-gray-800 rounded-md">Approve</button>
-                                    <button onClick={() => handleReject(request.Leave_ID, request)} className="px-4 py-2 text-black bg-gray-300 rounded-md">Reject</button>
+                                    <button onClick={() => handleApprove(request.Leave_ID)} className="px-4 py-2 text-white bg-gray-800 rounded-md">Approve</button>
+                                    <button onClick={() => handleReject(request.Leave_ID)} className="px-4 py-2 text-black bg-gray-300 rounded-md">Reject</button>
 
                                 </div>
                             </div>
