@@ -99,6 +99,7 @@ const AddEmployee = () => {
         setShowForm(false);
         downloadCredentials(newEmployee);
         saveUser(newEmployee);
+        window.location.reload();
     };
 
     const handleUpdate = (id) => {

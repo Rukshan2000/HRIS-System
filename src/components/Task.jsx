@@ -79,8 +79,12 @@ const Task = () => {
     };
 
     const addTask = async () => {
+        const newTaskData = {
+            ...taskData,
+            status:'In Progress',
+        }
         try {
-            const response = await axios.post('http://localhost:8081/api/task', taskData, {
+            const response = await axios.post('http://localhost:8081/api/task', newTaskData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

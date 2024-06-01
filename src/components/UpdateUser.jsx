@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
@@ -62,6 +63,20 @@ const UpdateUser = () => {
         // Add logic to update user data or delete user
         // For demo, just console log the updated data
         console.log('Form submitted with data:', formData);
+
+
+        const newData ={
+            allowance: formData.allowance
+        }
+        axios.patch(`http://localhost:8081/api/employee/${formData.employeeId}`, newData)
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error(`There was an error updating the leave request with ID ${formData.employeeId}!`, error);
+            });
+
+
         // Find the index of the employee to be updated
         const index = dummyEmployees.findIndex(emp => emp.employeeId === formData.employeeId);
         // Update the employee data
