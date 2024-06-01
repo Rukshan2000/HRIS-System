@@ -1,26 +1,21 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'; // Import useLocation
-
 
 const AdProfile = () => {
     // State to store employee data
     const [employee, setEmployee] = useState(null);
-    const [employeeId, setEmployeeId] = useState();
     const location = useLocation();
     const username = location.state && location.state.username;
 
-
-
-    // Function to fetch employee data
+    // Function to fetch employee data based on username
     const fetchEmployee = async () => {
         try {
-            const response = await fetch('http://localhost:8081/api/employee');
+            const response = await fetch(`http://localhost:8081/api/employee?username=${username}`);
             const result = await response.json();
             if (result.success === 1 && Array.isArray(result.data)) {
-                // Filter the employees data for Emp_ID = 1
-                const filteredEmployee = result.data.find(employee => employee.Emp_ID == employeeId);
-                setEmployee(filteredEmployee);
+                // Assuming username is unique, directly take the first employee from the array
+                const foundEmployee = result.data[0];
+                setEmployee(foundEmployee);
             } else {
                 console.error('Unexpected data format:', result);
             }
@@ -28,26 +23,11 @@ const AdProfile = () => {
             console.error('Error fetching employee:', error);
         }
     };
-//
+
     // Fetch employee data on component mount
     useEffect(() => {
-
-        const token = localStorage.getItem("token");
-        if (token) {
-            axios.get('http://localhost:8081/getuser', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-          .then(res => {
-            console.log('data',res.data);
-            setEmployeeId(res.data.empId);
-          })
-          .then(err => console.log(err));
-        };
         fetchEmployee();
-    }, []);
-
+    }, [username]); // Trigger fetchEmployee again when username changes
 
     // Return loading message while data is being fetched
     if (!employee) {

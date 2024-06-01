@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 const Payroll = () => {
     const [employees, setEmployees] = useState([
-        { id: 1, department: 'department A', otHours: 5, noPayLeaves: 2, allowance: 100, salary: 200000 },
-        { id: 2, department: 'department B', otHours: 3, noPayLeaves: 1, allowance: 150, salary: 250000 },
-        { id: 3, department: 'department C', otHours: 1, noPayLeaves: 1, allowance: 100, salary: 100000 },
+        { id: 1, department: 'department A', otHours: 5, allowance: 100, salary: 200000 },
+        { id: 2, department: 'department B', otHours: 3, allowance: 150, salary: 250000 },
+        { id: 3, department: 'department C', otHours: 1, allowance: 100, salary: 100000 },
         // Add more employees here
     ]);
 
@@ -12,7 +12,6 @@ const Payroll = () => {
         id: '',
         department: '',
         otHours: '',
-        noPayLeaves: '',
         allowance: '',
         salary: ''
     });
@@ -45,7 +44,7 @@ const Payroll = () => {
         } else {
             setEmployees([...employees, { ...formData, id: Date.now() }]);
         }
-        setFormData({ id: '', department: '', otHours: '', noPayLeaves: '', allowance: '', salary: '' });
+        setFormData({ id: '', department: '', otHours: '', allowance: '', salary: '' });
         setShowForm(false);
     };
 
@@ -61,21 +60,18 @@ const Payroll = () => {
     };
 
     const handleGenerate = (id) => {
-        
         const updatedEmployees = employees.map((emp) => {
             if (emp.id === id) {
                 const otHourlyRate = parseFloat(emp.salary) / 176;
-                const noPayDeduction = parseFloat(emp.salary) / 22;
-    
+
                 const totalOT = parseFloat(emp.otHours) * otHourlyRate;
-                const totalNPLeaves = parseFloat(emp.noPayLeaves) * noPayDeduction;
-                const totalSalary = parseFloat(emp.salary) + totalOT - totalNPLeaves;
+                const totalSalary = parseFloat(emp.salary) + totalOT;
                 const totalAllowance = parseFloat(emp.allowance);
-    
+
                 // Tax calculation
                 const annualSalary = parseFloat(emp.salary) * 12;
                 let tax = 0;
-    
+
                 if (annualSalary <= 1200000) {
                     tax = 0;
                 } else if (annualSalary <= 2000000) {
@@ -91,7 +87,7 @@ const Payroll = () => {
                 } else {
                     tax = 69000 + (annualSalary - 4200000) * 0.36;
                 }
-    
+
                 // EPF and ETF calculation
                 const employeeEPFContribution = parseFloat(emp.salary) * 0.08;
                 const employerEPFContribution = parseFloat(emp.salary) * 0.12;
@@ -99,26 +95,24 @@ const Payroll = () => {
                 const totalEmployerContribution = employerEPFContribution + employerETFContribution;
                 const totalEPFs = employeeEPFContribution + employerEPFContribution;
                 const totalETF = employerETFContribution;
-    
+
                 // Deduct EPF, ETF, tax, and allowance contributions from total income
                 const totalIncome = (totalSalary + totalAllowance - tax - totalEPFs - totalETF).toFixed(2);
-    
+
                 return {
                     ...emp,
                     totalIncome: totalIncome,
                     totalETF: totalETF.toFixed(2),
                     totalEPF: totalEPFs.toFixed(2),
-                    totalTax: tax.toFixed(2)
+                    totalTax: tax.toFixed(2),
+                    totalOT: totalOT.toFixed(2),
+
                 };
             }
             return emp;
         });
         setEmployees(updatedEmployees);
     };
-    
-
-
-
 
     const filteredEmployees = employees.filter((emp) => {
         const { department } = filters;
@@ -173,13 +167,15 @@ const Payroll = () => {
                     </div>
                 </div>
             )}
+           
             <div className="overflow-auto">
                 <table className="w-full border border-collapse border-gray-300">
                     <thead>
                         <tr className="bg-gray-200">
-                            <th className="px-4 py-2 border border-gray-300">Emp ID</th>
+                        <th className="px-4 py-2 border border-gray-300">Emp ID</th>
                             <th className="px-4 py-2 border border-gray-300">Department</th>
-                            <th className="px-4 py-2 border border-gray-300">Salary</th>
+                            <th className="px-4 py-2 border border-gray-300">Total OT</th>
+                            <th className="px-4 py-2 border border-gray-300">Allowance</th>
                             <th className="px-4 py-2 border border-gray-300">Total ETF</th>
                             <th className="px-4 py-2 border border-gray-300">Total EPF</th>
                             <th className="px-4 py-2 border border-gray-300">Total Tax</th>
@@ -191,7 +187,8 @@ const Payroll = () => {
                             <tr key={emp.id}>
                                 <td className="px-4 py-2 border border-gray-300">{emp.id}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.department}</td>
-                                <td className="px-4 py-2 border border-gray-300">{emp.salary}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.totalOT}</td>
+                                <td className="px-4 py-2 border border-gray-300">{emp.allowance}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.totalETF}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.totalEPF}</td>
                                 <td className="px-4 py-2 border border-gray-300">{emp.totalTax}</td>

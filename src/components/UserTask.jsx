@@ -57,6 +57,10 @@ const UserTask = () => {
         setSelectedTaskId(null);
     };
 
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString();
+    };
+
     return (
         <div className="container px-4 py-8 mx-auto">
             <h1 className="mb-4 text-2xl font-bold">{employeeName}'s Tasks</h1>
@@ -67,7 +71,8 @@ const UserTask = () => {
                             <div className="p-6 space-y-4">
                                 <h2 className="text-lg font-semibold">{task.Title}</h2>
                                 <p className="text-sm text-gray-600">Task Description: {task.Description}</p>
-                                <p className="text-sm text-gray-600">Start Date: {task.Start_Date} - End Date: {task.End_Date}</p>
+                                <p className="text-sm text-gray-600">Hand On Date: {formatDate(task.Start_Date)}</p>
+                                <p className="text-sm text-gray-600">Deadline: {formatDate(task.Start_Date)} </p>
                                 <div className="flex justify-end space-x-4">
                                     <button onClick={() => handleComplete(task.Task_ID)} className="px-4 py-2 text-white bg-gray-800 rounded-md">Complete</button>
                                 </div>

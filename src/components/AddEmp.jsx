@@ -188,8 +188,7 @@ const Employee = () => {
     });
 
     return (
-        <div className="container flex flex-col items-center mx-auto">
-            <h1 className="mb-4 text-2xl font-bold">Employee</h1>
+        <div className="container flex flex-col items-center mx-auto mt-5">
             <button
                 onClick={toggleForm}
                 className="px-4 py-2 mb-4 text-white bg-blue-500 rounded-md"

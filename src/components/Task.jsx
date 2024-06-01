@@ -12,6 +12,7 @@ const Task = () => {
         endTime: '',
     });
     const [showForm, setShowForm] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('');
 
     useEffect(() => {
         fetchTask();
@@ -139,10 +140,13 @@ const Task = () => {
         }
     };
 
+    const filteredTasks = statusFilter
+        ? tasks.filter(task => task.status === statusFilter)
+        : tasks;
+
     return (
         <div className="p-4">
             <div>
-                <h1 className="mb-4 text-2xl font-bold">Employee</h1>
                 <button
                     onClick={toggleForm}
                     className="px-4 py-2 mb-4 text-white bg-blue-500 rounded-md"
@@ -159,7 +163,20 @@ const Task = () => {
                     />
                 )}
             </div>
-
+            <div className="mb-4">
+                <label htmlFor="statusFilter" className="block mb-2">Filter by Status:</label>
+                <select
+                    id="statusFilter"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="p-2 border border-gray-300 rounded-md"
+                >
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
             <table className="w-full table-auto">
                 <thead>
                     <tr>
@@ -170,7 +187,7 @@ const Task = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map((task) => (
+                    {filteredTasks.map((task) => (
                         <tr key={task.id}>
                             <td className="px-4 py-2 border">{task.title}</td>
                             <td className="px-4 py-2 border">
@@ -279,4 +296,3 @@ const TaskForm = ({ handleSubmit, handleChange, taskData, assignedTo, toggleForm
 };
 
 export default Task;
-
