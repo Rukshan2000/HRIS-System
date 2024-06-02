@@ -5,7 +5,6 @@ const Payroll = () => {
     const [employees, setEmployees] = useState([]);
     const [designations, setDesignations] = useState([]);
     const [attendance, setAttendance] = useState([]);
-    const [currentDate, setCurrentDate] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,36 +26,17 @@ const Payroll = () => {
 
     const calculateOTHours = (attendanceRecords) => {
         let totalOTHours = 0;
-        // Create a map to store OT hours for each employee ID
-        const otHoursMap = {};
-
         attendanceRecords.forEach(record => {
             const inTime = new Date(`1970-01-01T${record.In_Time}Z`);
             const outTime = new Date(`1970-01-01T${record.Out_Time}Z`);
             const hoursWorked = (outTime - inTime) / (1000 * 60 * 60);
             const otHours = hoursWorked > 8 ? hoursWorked - 8 : 0;
-
-            // Aggregate OT hours for each employee ID
-            if (otHoursMap[record.Emp_ID]) {
-                otHoursMap[record.Emp_ID] += otHours;
-            } else {
-                otHoursMap[record.Emp_ID] = otHours;
-            }
-        });
-
-        // Sum up OT hours for all employee IDs
-        Object.values(otHoursMap).forEach(otHours => {
             totalOTHours += otHours;
         });
-
         return totalOTHours;
     };
 
     const handleGenerateAll = () => {
-        const now = new Date();
-        const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-        setCurrentDate(formattedDate);
-
         const updatedEmployees = employees.map((emp) => {
             const empDesignation = designations.find(d => d.Desig_ID === emp.Designation_ID);
             const empAttendance = attendance.filter(a => a.Emp_ID === emp.Emp_ID);
@@ -105,8 +85,7 @@ const Payroll = () => {
                 totalEPF: totalEPFs.toFixed(2),
                 totalTax: tax.toFixed(2),
                 totalOT: totalOT.toFixed(2),
-                totalOTHours: totalOTHours.toFixed(2),
-                date: formattedDate // Set the date attribute to the formatted date
+                totalOTHours: totalOTHours.toFixed(2)
             };
         });
         setEmployees(updatedEmployees);
@@ -128,12 +107,10 @@ const Payroll = () => {
                             <th className="px-4 py-2 border border-gray-300">Base Salary</th>
                             <th className="px-4 py-2 border border-gray-300">Total OT Hours</th>
                             <th className="px-4 py-2 border border-gray-300">Allowance</th>
-                            <th className="px-4 py-2 border border-gray-300">OT Payment</th>
                             <th className="px-4 py-2 border border-gray-300">Total ETF</th>
                             <th className="px-4 py-2 border border-gray-300">Total EPF</th>
                             <th className="px-4 py-2 border border-gray-300">Total Tax</th>
                             <th className="px-4 py-2 border border-gray-300">Total Income</th>
-                            <th className="px-4 py-2 border border-gray-300">Date</th> {/* New column for Date */}
                         </tr>
                     </thead>
                     <tbody>
@@ -145,33 +122,33 @@ const Payroll = () => {
                             return (
                                 <React.Fragment key={emp.Emp_ID}>
                                     {empAttendance.map((record, index) => (
-    <tr key={index}>
-        {index === 0 && (
-            <>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Emp_ID}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{empDesignation ? empDesignation.Base_Salary : ''}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{totalOTHours.toFixed(2)}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Allowance}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalOT}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalETF}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalIncome}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.date}</td> {/* Display Date */}
-            </>
-        )}
-    </tr>
-))}
-</React.Fragment>
-);
-})}
-</tbody>
-</table>
-</div>
-</div>
-);
+                                        <tr key={index}>
+                                            {index === 0 && (
+                                                <>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Emp_ID}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{empDesignation ? empDesignation.Base_Salary : ''}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{totalOTHours.toFixed(2)}</td>
+                                                </>
+                                            )}
+                                            {index === 0 && (
+                                                <>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Allowance}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalETF}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalIncome}</td>
+                                                </>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </React.Fragment>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
 };
 
 export default Payroll;
-
-
