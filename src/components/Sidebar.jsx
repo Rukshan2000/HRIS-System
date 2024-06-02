@@ -14,7 +14,8 @@ import {
     FaThList,
     FaUserEdit,
     FaFile,
-    FaSignOutAlt // Add sign-out icon
+    FaSignOutAlt, // Add sign-out icon
+    FaPaperclip
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
 
@@ -59,6 +60,12 @@ const Sidebar = ({ children }) => {
             path: "/employeeupdate",
             name: "Manage Employee",
             icon: <FaUserEdit />
+        },
+
+        {
+            path: "/reportpage",
+            name: "Data Reports",
+            icon: <FaPaperclip />
         },
         {
             path: "/mydashboard",

@@ -23,6 +23,7 @@ import PayRollUser from './pages/PayRollUser.jsx';
 import LeaveUser from './pages/LeaveUser.jsx';
 import EmployeeUpdate from './pages/EmployeeUpdate.jsx';
 import Announcement from './pages/Announcement.jsx';
+import ReportPage from './pages/ReportPage.jsx';
 import PrivateRoutes from './utils/PrivateRoutes.js';
 import Page404 from './pages/Page404.jsx';
 
@@ -49,6 +50,7 @@ const App = () => {
           <Route path="/announcement" element={<Sidebar><Announcement /></Sidebar>} />
           <Route path="/employeeupdate" element={<Sidebar><EmployeeUpdate /></Sidebar>} />
           <Route path="/mydashboard" element={<MyDashboard />} /> 
+          <Route path="/reportpage" element={<Sidebar><ReportPage /></Sidebar>} /> 
           <Route path="/leaveuser" element={<LeaveUser />} /> 
           <Route path="/payrolluser" element={<PayRollUser />} /> 
           <Route path="/profileuser" element={<ProfileUser />} /> 
