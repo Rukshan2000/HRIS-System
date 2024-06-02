@@ -26,6 +26,8 @@ import Announcement from './pages/Announcement.jsx';
 import ReportPage from './pages/ReportPage.jsx';
 import PrivateRoutes from './utils/PrivateRoutes.js';
 import Page404 from './pages/Page404.jsx';
+import ManagePayroll from './components/ManagePayroll.jsx';
+
 
 const App = () => {
   return (
@@ -55,6 +57,7 @@ const App = () => {
           <Route path="/payrolluser" element={<PayRollUser />} /> 
           <Route path="/profileuser" element={<ProfileUser />} /> 
           <Route path="/taskuser" element={<TaskUser />} />
+          <Route path="/managepayroll" element={<Sidebar><ManagePayroll /></Sidebar>} />
           <Route path="*" element={<Page404 />} /> 
 
         {/* </Route>  */}

@@ -5,10 +5,12 @@ import * as XLSX from 'xlsx';
 const Report = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [payrollData, setPayrollData] = useState([]);
 
   useEffect(() => {
     fetchEmployeeData();
     fetchAttendanceData();
+    fetchPayrollData();
   }, []); // Empty dependency array to run the effect only once after initial render
 
   // Function to fetch employee data from the API
@@ -35,6 +37,18 @@ const Report = () => {
     }
   };
 
+  // Function to fetch payroll data from the API
+  const fetchPayrollData = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/payroll');
+      const payroll = response.data.data;
+      console.log('Fetched Payroll:', payroll);
+      setPayrollData(payroll);
+    } catch (error) {
+      console.error('Error fetching payroll:', error);
+    }
+  };
+
   // Function to convert employee data to Excel file format and trigger download
   const handleDownloadEmployeeExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(employeeData);
@@ -49,6 +63,14 @@ const Report = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance');
     XLSX.writeFile(workbook, 'attendance_report.xlsx');
+  };
+
+  // Function to convert payroll data to Excel file format and trigger download
+  const handleDownloadPayrollExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(payrollData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Payroll');
+    XLSX.writeFile(workbook, 'payroll_report.xlsx');
   };
 
   return (
@@ -71,7 +93,12 @@ const Report = () => {
           </div>
         </div>
         <div className="p-4 m-4 text-white bg-yellow-500 rounded-lg shadow-md w-80 h-60">
-          <h2 className="mb-4 text-2xl font-semibold">Payroll Report</h2>
+          <div className="flex flex-col justify-between h-full">
+            <h2 className="mb-4 text-2xl font-semibold">Payroll Report</h2>
+            {payrollData.length > 0 && (
+              <button onClick={handleDownloadPayrollExcel} className="px-4 py-2 text-white bg-yellow-800 rounded-lg">Download</button>
+            )}
+          </div>
         </div>
       </div>
     </div>

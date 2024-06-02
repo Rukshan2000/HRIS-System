@@ -2,6 +2,7 @@ import React from 'react';
 import AddEmp from '../components/AddEmp';
 
 
+
 import { FaUser } from 'react-icons/fa'; // Import the user icon
 
 const Employee = () => {
@@ -25,7 +26,7 @@ const Employee = () => {
                 </div>
             </div>
             <AddEmp />
-        </div>
+=        </div>
     );
 };
 
