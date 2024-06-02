@@ -52,6 +52,28 @@ const Payroll = () => {
         return totalOTHours;
     };
 
+    const savePayroll =async (generatedData) => {
+        const payrollArray = generatedData.map(emp => ({
+            employeeId: emp.Emp_ID,
+            baseSalary: emp.baseSalary,
+            otHours: emp.totalOTHours,
+            allowance: emp.Allowance,
+            otPayment: emp.totalOT,
+            etf: emp.totalETF,
+            epf: emp.totalEPF,
+            tax: emp.totalTax,
+            income: emp.totalIncome,
+            date: emp.date
+        }));
+        console.log('Payroll Array:', payrollArray);
+        try {
+            const response = await axios.post('http://localhost:8081/api/payroll', payrollArray);
+            console.log('Payroll data saved:', response.data);
+        } catch (error) {
+            console.error('Error saving payroll data:', error);
+        }
+    };
+
     const handleGenerateAll = () => {
         const now = new Date();
         const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
@@ -100,6 +122,7 @@ const Payroll = () => {
 
             return {
                 ...emp,
+                baseSalary: empDesignation.Base_Salary,
                 totalIncome: totalIncome,
                 totalETF: totalETF.toFixed(2),
                 totalEPF: totalEPFs.toFixed(2),
@@ -110,6 +133,8 @@ const Payroll = () => {
             };
         });
         setEmployees(updatedEmployees);
+        savePayroll(updatedEmployees);
+       
     };
 
     return (
@@ -145,31 +170,31 @@ const Payroll = () => {
                             return (
                                 <React.Fragment key={emp.Emp_ID}>
                                     {empAttendance.map((record, index) => (
-    <tr key={index}>
-        {index === 0 && (
-            <>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Emp_ID}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{empDesignation ? empDesignation.Base_Salary : ''}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{totalOTHours.toFixed(2)}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Allowance}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalOT}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalETF}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalIncome}</td>
-                <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.date}</td> {/* Display Date */}
-            </>
-        )}
-    </tr>
-))}
-</React.Fragment>
-);
-})}
-</tbody>
-</table>
-</div>
-</div>
-);
+                                        <tr key={index}>
+                                            {index === 0 && (
+                                                <>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Emp_ID}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{empDesignation ? empDesignation.Base_Salary : ''}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{totalOTHours.toFixed(2)}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Allowance}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalOT}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalETF}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalIncome}</td>
+                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.date}</td> {/* Display Date */}
+                                                </>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </React.Fragment>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
 };
 
 export default Payroll;
