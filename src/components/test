@@ -1,154 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Payroll = () => {
-    const [employees, setEmployees] = useState([]);
-    const [designations, setDesignations] = useState([]);
-    const [attendance, setAttendance] = useState([]);
+const UpdateAnn = () => {
+  const [announcementPreviews, setAnnouncementPreviews] = useState([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const employeeResponse = await axios.get('http://localhost:8081/api/employee');
-                const designationResponse = await axios.get('http://localhost:8081/api/designation');
-                const attendanceResponse = await axios.get('http://localhost:8081/api/attendance');
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
-                setEmployees(employeeResponse.data.data);
-                setDesignations(designationResponse.data.data);
-                setAttendance(attendanceResponse.data.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/announcement');
+      const announcements = response.data.data;
+      console.log('Fetched Announcements:', announcements);
+      setAnnouncementPreviews(announcements);
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+    }
+  };
 
-        fetchData();
-    }, []);
-
-    const calculateOTHours = (attendanceRecords) => {
-        let totalOTHours = 0;
-        attendanceRecords.forEach(record => {
-            const inTime = new Date(`1970-01-01T${record.In_Time}Z`);
-            const outTime = new Date(`1970-01-01T${record.Out_Time}Z`);
-            const hoursWorked = (outTime - inTime) / (1000 * 60 * 60);
-            const otHours = hoursWorked > 8 ? hoursWorked - 8 : 0;
-            totalOTHours += otHours;
-        });
-        return totalOTHours;
-    };
-
-    const handleGenerateAll = () => {
-        const updatedEmployees = employees.map((emp) => {
-            const empDesignation = designations.find(d => d.Desig_ID === emp.Designation_ID);
-            const empAttendance = attendance.filter(a => a.Emp_ID === emp.Emp_ID);
-            const totalOTHours = calculateOTHours(empAttendance);
-
-            const otHourlyRate = empDesignation ? parseFloat(empDesignation.Base_Salary) / 176 : 0;
-            const totalOT = totalOTHours * otHourlyRate;
-            const totalSalary = empDesignation ? parseFloat(empDesignation.Base_Salary) + totalOT : 0;
-            const totalAllowance = parseFloat(emp.Allowance);
-
-            // Tax calculation
-            const annualSalary = totalSalary * 12;
-            let tax = 0;
-
-            if (annualSalary <= 1200000) {
-                tax = 0;
-            } else if (annualSalary <= 2000000) {
-                tax = 2500;
-            } else if (annualSalary <= 2500000) {
-                tax = 5000;
-            } else if (annualSalary <= 3000000) {
-                tax = 7500;
-            } else if (annualSalary <= 3500000) {
-                tax = 10000;
-            } else if (annualSalary <= 4000000) {
-                tax = 12500;
-            } else {
-                tax = 69000 + (annualSalary - 4200000) * 0.36;
-            }
-
-            // EPF and ETF calculation
-            const employeeEPFContribution = totalSalary * 0.08;
-            const employerEPFContribution = totalSalary * 0.12;
-            const employerETFContribution = totalSalary * 0.03;
-            const totalEmployerContribution = employerEPFContribution + employerETFContribution;
-            const totalEPFs = employeeEPFContribution + employerEPFContribution;
-            const totalETF = employerETFContribution;
-
-            // Deduct EPF, ETF, tax, and allowance contributions from total income
-            const totalIncome = (totalSalary + totalAllowance - tax - totalEPFs - totalETF).toFixed(2);
-
-            return {
-                ...emp,
-                totalIncome: totalIncome,
-                totalETF: totalETF.toFixed(2),
-                totalEPF: totalEPFs.toFixed(2),
-                totalTax: tax.toFixed(2),
-                totalOT: totalOT.toFixed(2),
-                totalOTHours: totalOTHours.toFixed(2)
-            };
-        });
-        setEmployees(updatedEmployees);
-    };
-
-    return (
-        <div className="container flex flex-col mx-auto">
-            <button
-                onClick={handleGenerateAll}
-                className="self-end px-4 py-2 mb-4 text-white bg-green-500 rounded-md"
-            >
-                Generate All
-            </button>
-            <div className="overflow-auto">
-                <table className="w-full border border-collapse border-gray-300">
-                    <thead>
-                        <tr className="bg-gray-200">
-                            <th className="px-4 py-2 border border-gray-300">Emp ID</th>
-                            <th className="px-4 py-2 border border-gray-300">Base Salary</th>
-                            <th className="px-4 py-2 border border-gray-300">Total OT Hours</th>
-                            <th className="px-4 py-2 border border-gray-300">Allowance</th>
-                            <th className="px-4 py-2 border border-gray-300">Total ETF</th>
-                            <th className="px-4 py-2 border border-gray-300">Total EPF</th>
-                            <th className="px-4 py-2 border border-gray-300">Total Tax</th>
-                            <th className="px-4 py-2 border border-gray-300">Total Income</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {employees.map((emp) => {
-                            const empDesignation = designations.find(d => d.Desig_ID === emp.Designation_ID);
-                            const empAttendance = attendance.filter(a => a.Emp_ID === emp.Emp_ID);
-                            const totalOTHours = calculateOTHours(empAttendance);
-
-                            return (
-                                <React.Fragment key={emp.Emp_ID}>
-                                    {empAttendance.map((record, index) => (
-                                        <tr key={index}>
-                                            {index === 0 && (
-                                                <>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Emp_ID}</td>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{empDesignation ? empDesignation.Base_Salary : ''}</td>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{totalOTHours.toFixed(2)}</td>
-                                                </>
-                                            )}
-                                            {index === 0 && (
-                                                <>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.Allowance}</td>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalETF}</td>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalEPF}</td>
-                                                    <td className="px-4 py-2 border border-gray-300" rowSpan={empAttendance.length}>{emp.totalIncome}</td>
-                                                </>
-                                            )}
-                                        </tr>
-                                    ))}
-                                </React.Fragment>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+  return (
+    <div className="relative min-h-screen p-4 bg-gray-50">
+      <h1 className="mb-8 text-3xl font-bold text-center text-blue-600">Announcements</h1>
+      {announcementPreviews.map((announcement, index) => (
+        <div key={index} className="w-full p-6 mx-auto mt-6 transition-shadow duration-300 ease-in-out bg-white border border-gray-200 rounded-lg shadow-lg md:w-3/4 lg:w-1/2 hover:shadow-xl">
+          <h3 className="mb-2 text-2xl font-bold text-gray-800">{announcement.Title}</h3>
+          <p className="mt-2 text-gray-700">{announcement.Body}</p>
+          <p className="mt-2 text-gray-500">From: {announcement.Emp_ID}</p>
+          <div className="flex justify-between mt-4">
+          </div>
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
-export default Payroll;
+export default UpdateAnn;
