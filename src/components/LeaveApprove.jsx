@@ -43,12 +43,12 @@ const LeaveApprove = () => {
 
     // Function to handle leave approval
     const handleApprove = (id) => {
-        updateLeaveStatus(id, 'approved');
+        updateLeaveStatus(id, 'Approved');
     };
 
     // Function to handle leave rejection
     const handleReject = (id) => {
-        updateLeaveStatus(id, 'rejected');
+        updateLeaveStatus(id, 'Rejected');
     };
 
 

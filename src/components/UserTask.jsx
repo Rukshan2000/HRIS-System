@@ -39,6 +39,17 @@ const UserTask = () => {
         }
     };
 
+    const updateTaskStatus = (id, status) => {
+        const newData ={status: status}
+        axios.patch(`http://localhost:8081/api/task/${id}`, newData)
+            .then(response => {
+               console.log('resdata',response); 
+            })
+            .catch(error => {
+                console.error(`There was an error updating the leave request with ID ${id}!`, error);
+            });
+    }
+
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -58,13 +69,16 @@ const UserTask = () => {
     const handleComplete = (id) => {
         const completedTask = tasks.find(task => task.Task_ID === id);
         setSelectedTaskId(completedTask.Title);
+        //update db
+        updateTaskStatus(id, 'Completed');
         setShowSuccessPopup(true);
         setClosedTasks([...closedTasks, id]);
-        console.log(`Task with ID ${id} completed.`);
+        console.log(`Task with ID ${id} Completed.`);
     };
 
     const handleNotCompleted = (id) => {
         // Implement logic to update task status as Not Completed in the database
+        updateTaskStatus(id, 'Not Completed');
         console.log(`Task with ID ${id} marked as Not Completed.`);
     };
 
