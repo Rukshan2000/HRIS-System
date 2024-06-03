@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const AddLeave = () => {
     // State variables for leave form
@@ -10,6 +10,8 @@ const AddLeave = () => {
     const [reason, setReason] = useState('');
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date()); // State for end date
+
+
 
     // Function to handle form submission
    // Function to handle form submission
@@ -53,7 +55,23 @@ const handleSubmit = (e) => {
         });
 };
 
+   // Fetch employee data on component mount
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios.get('http://localhost:8081/getuser', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => {
+                    // console.log('data', res.data);
+                    setEmployeeId(res.data.empId);
+                })
+                .catch(err => console.log(err));
+        };
 
+    }, []);
     return (
         <div className="flex flex-col justify-between p-4 md:flex-row">
             {/* Add Leave form */}
@@ -76,7 +94,8 @@ const handleSubmit = (e) => {
                             id="employeeId" 
                             value={employeeId} 
                             onChange={(e) => setEmployeeId(e.target.value)} 
-                            className="block w-full px-4 py-2 mt-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" />
+                            className="block w-full px-4 py-2 mt-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" 
+                            disabled />
                     </div>
                     <div>
                         <label htmlFor="reason" className="block text-sm font-semibold text-gray-700">Reason</label>

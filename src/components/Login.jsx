@@ -35,18 +35,16 @@ const Login = () => {
 
         axios.post('http://localhost:8081/api/users/login', data)
         .then(res => {
+            console.log('login', res.data);
             if (res.data.success==1) {
-                // if (res.data.role === 'admin') {
-                //     localStorage.setItem("token",res.data.token);
-                //     navigate('/dashboard');
-                // } else {
-                //     navigate('/mydashboard');
-                // }
-                localStorage.setItem("token",res.data.token);
-                navigate('/dashboard');
+                if (res.data.role === 'admin') {
+                    localStorage.setItem("token",res.data.token);
+                    navigate('/dashboard');
+                }else{
+                    localStorage.setItem("token",res.data.token); 
+                    navigate('/mydashboard');
+                }
             } 
-            console.log('res',res);
-            alert(res.data.message)
         })
         .catch(err => {
             console.log(err);
