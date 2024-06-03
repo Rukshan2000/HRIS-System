@@ -8,17 +8,13 @@ const LeaveApprovedStatus = () => {
     
     const [leaveStatusData, setLeaveStatusData] = useState([]);
 
-    useEffect(() => {
-        fetchLeaveStatus();
-    }, []);
-
-    const fetchLeaveStatus = async () => {
+    const fetchLeaveStatus = async (empId) => {
         try {
             const response = await axios.get('http://localhost:8081/api/leave');
             const result = response.data;
             if (result.success === 1 && Array.isArray(result.data)) {
                 const filteredData = result.data
-                    .filter(leave => leave.Emp_ID === 1) // Filter by employee ID 1
+                    .filter(leave => leave.Emp_ID === empId) // Filter by employee ID 1
                     .map(leave => ({
                         date: new Date(leave.Start_Date).toISOString().split('T')[0], // Format date to YYYY-MM-DD
                         status: leave.Statuss,
@@ -33,6 +29,24 @@ const LeaveApprovedStatus = () => {
             setLeaveStatusData([]);
         }
     };
+    
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios.get('http://localhost:8081/getuser', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => {
+                    // console.log('data', res.data);
+                    fetchLeaveStatus(res.data.empId);
+                })
+                .catch(err => console.log(err));
+        };
+    }, []);
+
+  
 
     return (
         <div className="p-4">
