@@ -9,45 +9,74 @@ const UserPayroll = () => {
     const [departmentDetails, setDepartmentDetails] = useState({});
     const [designationDetails, setDesignationDetails] = useState({});
     const [selectedDate, setSelectedDate] = useState('');
+    const [empId, setempId] = useState('');
+    const [dates, setdates] = useState('');
+
     const eid = 5; // Define eid as a constant variable
 
+    const fetchData =  () => {
+        try {
+            axios.get('http://localhost:8081/api/payroll')
+            .then(res =>{
+                console.log('paydata',res.data);
+                setEmployeePayroll(res.data.data);
+                setdates(res.data.data.map(pay => pay.Date));
+            });
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const payrollResponse = await axios.get('http://localhost:8081/api/payroll');
-                setEmployeePayroll(payrollResponse.data.data);
-
-                const employeeResponse = await axios.get('http://localhost:8081/api/employee');
-                const employees = employeeResponse.data.data.reduce((acc, emp) => {
+            axios.get('http://localhost:8081/api/employee')
+            .then(res=>{
+                setEmployeeDetails(res.data.data.reduce((acc, emp) => {
                     acc[emp.Emp_ID] = emp;
                     return acc;
-                }, {});
-                setEmployeeDetails(employees);
+                }, {}));
 
-                const departmentResponse = await axios.get('http://localhost:8081/api/department');
-                const departments = departmentResponse.data.data.reduce((acc, dept) => {
+            });
+            
+
+            axios.get('http://localhost:8081/api/department')
+            .then(res=>{
+                setDepartmentDetails(res.data.data.reduce((acc, dept) => {
                     acc[dept.Dept_ID] = dept;
                     return acc;
-                }, {});
-                setDepartmentDetails(departments);
-                
-                const designationResponse = await axios.get('http://localhost:8081/api/designation');
-                const designations = designationResponse.data.data.reduce((acc, desig) => {
+                }, {}));
+
+            });
+          
+            
+            axios.get('http://localhost:8081/api/designation')
+            .then(res=>{
+                setDesignationDetails(res.data.data.reduce((acc, desig) => {
                     acc[desig.Desig_ID] = desig;
                     return acc;
-                }, {});
-                setDesignationDetails(designations);
+                }, {}));
 
-                const dates = payrollResponse.data.data.map(pay => pay.Date);
-                const uniqueDates = [...new Set(dates)];
-                setUniqueDates(uniqueDates);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+            });
+    
+
+            
+            const uniqueDates = [...new Set(dates)];
+            setUniqueDates(uniqueDates);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios.get('http://localhost:8081/getuser', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => {
+                    // console.log('data', res.data.empId);
+                    setempId(res.data.empId)
+                    fetchData();
+                })
+                .catch(err => console.log(err));
         };
 
-        fetchData();
     }, []);
 
     const formatDate = (dateString) => {
@@ -71,8 +100,8 @@ const UserPayroll = () => {
         setSelectedDate(event.target.value);
     };
     const filteredPayroll = selectedDate ?
-    employeePayroll.filter(pay => pay.Date === selectedDate && pay.Emp_ID === eid) :
-    employeePayroll.filter(pay => pay.Emp_ID === eid);
+    employeePayroll.filter(pay => pay.Date === selectedDate && pay.Emp_ID === empId) :
+    employeePayroll.filter(pay => pay.Emp_ID === empId);
 
 
     return (

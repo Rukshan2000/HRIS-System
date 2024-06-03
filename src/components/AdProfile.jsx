@@ -1,33 +1,81 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation
+import SuccessMessage from './SuccessMessage';
+
 
 const AdProfile = () => {
     // State to store employee data
     const [employee, setEmployee] = useState(null);
-    const location = useLocation();
-    const username = location.state && location.state.username;
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordsMatch, setPasswordsMatch] = useState(true);
+    const [passwordUpdateSuccess, setPasswordUpdateSuccess] = useState(false);
+    const [employeeId, setemployeeId] = useState('');
+
 
     // Function to fetch employee data based on username
-    const fetchEmployee = async () => {
+    const fetchEmployee = async (empid) => {
         try {
-            const response = await fetch(`http://localhost:8081/api/employee?username=${username}`);
-            const result = await response.json();
-            if (result.success === 1 && Array.isArray(result.data)) {
-                // Assuming username is unique, directly take the first employee from the array
-                const foundEmployee = result.data[0];
-                setEmployee(foundEmployee);
-            } else {
-                console.error('Unexpected data format:', result);
-            }
+            await axios.get(`http://localhost:8081/api/employee/${empid}`)
+                .then(res => {
+                    setEmployee(res.data.data)
+                });
+
         } catch (error) {
             console.error('Error fetching employee:', error);
         }
     };
 
+    // Function to handle password update
+    const handlePasswordUpdate = (e) => {
+        e.preventDefault();
+        // Check if new password and confirm password match
+        if (newPassword === confirmPassword) {
+            
+            const data = {
+                password: newPassword
+            }
+            // Update employee's password
+            try {
+                axios.patch(`http://localhost:8081/api/users/${employeeId}`, data)
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            } catch (error) {
+                console.log('update error', error)
+            }
+
+            // Reset password fields and hide modal
+            setNewPassword('');
+            setConfirmPassword('');
+            setShowPasswordModal(false);
+            // Set password update success status
+            setPasswordUpdateSuccess(true);
+        } else {
+            // Set passwordsMatch state to false to display red notification
+            setPasswordsMatch(false);
+        }
+    };
+
     // Fetch employee data on component mount
     useEffect(() => {
-        fetchEmployee();
-    }, [username]); // Trigger fetchEmployee again when username changes
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios.get('http://localhost:8081/getuser', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => {
+                    // console.log('data', res.data);
+                    setemployeeId(res.data.empId);
+                    fetchEmployee(res.data.empId);
+                })
+                .catch(err => console.log(err));
+        };
+
+    }, []);
 
     // Return loading message while data is being fetched
     if (!employee) {
@@ -73,6 +121,54 @@ const AdProfile = () => {
                         <p><span className="font-semibold">Contact Number:</span> {employee.Emergency_Contact}</p>
                     </div>
                 </div>
+            </div>
+
+             {/* Password Update Modal */}
+             {showPasswordModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="p-6 bg-white rounded-lg shadow-md">
+                        <h3 className="mb-4 text-lg font-semibold">Update Password</h3>
+                        <form onSubmit={handlePasswordUpdate}>
+                            {/* Password input fields */}
+                            <div className="mb-4">
+                                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">New Password</label>
+                                <input 
+                                    type="password" 
+                                    id="newPassword" 
+                                    name="newPassword" 
+                                    value={newPassword} 
+                                    onChange={(e) => setNewPassword(e.target.value)} 
+                                    className="block w-full p-2 mt-1 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    value={confirmPassword} 
+                                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                                    className={`block w-full p-2 mt-1 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 ${!passwordsMatch && 'border-red-500'}`} 
+                                />
+                                {/* Red notification for mismatched passwords */}
+                                {!passwordsMatch && <p className="mt-1 text-sm text-red-500">Passwords do not match.</p>}
+                            </div>
+                            <div className="flex justify-end">
+                                <button type="button" onClick={() => setShowPasswordModal(false)} className="px-4 py-2 mr-2 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:bg-gray-300">Cancel</button>
+                                <button type="submit" className="px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {/* Success message pop-up */}
+            {passwordUpdateSuccess && (
+                <SuccessMessage message="Password updated successfully!" onClose={() => setPasswordUpdateSuccess(false)} />
+            )}
+            {/* Button to toggle password update modal */}
+            <div className="flex justify-center mt-8">
+                <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Update Password</button>
             </div>
         </div>
     );

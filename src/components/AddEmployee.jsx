@@ -108,10 +108,6 @@ const AddEmployee = () => {
             password: newPassword
         }
         // Update employee's password
-        // const updatedEmployees = employees.map(emp =>
-        //     emp.id === id ? { ...emp, password: newPassword } : emp
-        // );
-        // setEmployees(updatedEmployees);
         try {
             axios.patch(`http://localhost:8081/api/users/${id}`, data)
                 .then(res => {

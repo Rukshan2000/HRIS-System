@@ -18,6 +18,7 @@ const TopNav = () => {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('token');  // Remove the JWT in local storage
     // Redirect to the logout page
     navigateTo('/splashpage');
   };
