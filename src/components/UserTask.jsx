@@ -8,7 +8,6 @@ const UserTask = () => {
     const [tasks, setTasks] = useState([]);
     const [employeeName, setEmployeeName] = useState('');
 
-
     const fetchEmployeeData = async (empId) => {
         try {
             // Fetch employee data
@@ -41,7 +40,7 @@ const UserTask = () => {
     };
 
     useEffect(() => {
-           const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         if (token) {
             axios.get('http://localhost:8081/getuser', {
                 headers: {
@@ -54,8 +53,7 @@ const UserTask = () => {
                 })
                 .catch(err => console.log(err));
         };
-
-    }, []); 
+    }, []);
 
     const handleComplete = (id) => {
         const completedTask = tasks.find(task => task.Task_ID === id);
@@ -63,6 +61,11 @@ const UserTask = () => {
         setShowSuccessPopup(true);
         setClosedTasks([...closedTasks, id]);
         console.log(`Task with ID ${id} completed.`);
+    };
+
+    const handleNotCompleted = (id) => {
+        // Implement logic to update task status as Not Completed in the database
+        console.log(`Task with ID ${id} marked as Not Completed.`);
     };
 
     const handleCloseSuccessPopup = () => {
@@ -88,6 +91,7 @@ const UserTask = () => {
                                 <p className="text-sm text-gray-600">Deadline: {formatDate(task.End_Date)} </p>
                                 <div className="flex justify-end space-x-4">
                                     <button onClick={() => handleComplete(task.Task_ID)} className="px-4 py-2 text-white bg-gray-800 rounded-md">Complete</button>
+                                    <button onClick={() => handleNotCompleted(task.Task_ID)} className="px-4 py-2 text-white bg-red-600 rounded-md">Not Complete</button>
                                 </div>
                             </div>
                         </div>

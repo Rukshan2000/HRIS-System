@@ -1,89 +1,110 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const UserTaskHistory = () => {
-    // Dummy data for user task history
-    const [selectedMonth, setSelectedMonth] = useState('');
-    const [selectedYear, setSelectedYear] = useState('');
-    const [userTaskHistory, setUserTaskHistory] = useState([
-        {
-            id: 1,
-            taskTitle: "Annual Report Preparation",
-            status: "Completed",
-            month: "May",
-            year: "2024"
-        },
-        {
-            id: 2,
-            taskTitle: "Project Presentation",
-            status: "Not Completed",
-            month: "June",
-            year: "2024"
-        },
-        {
-            id: 3,
-            taskTitle: "Marketing Campaign Plan",
-            status: "In Progress",
-            month: "June",
-            year: "2024"
-        },
-        // Add more user task history here
-    ]);
+const UserTask = () => {
+    const [tasks, setTasks] = useState([]);
+    const [employeeName, setEmployeeName] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
 
-    // Function to filter task history by month and year
-    const filteredTaskHistory = userTaskHistory.filter(task => {
-        if (selectedMonth && selectedYear) {
-            return task.month === selectedMonth && task.year === selectedYear;
-        } else if (selectedMonth) {
-            return task.month === selectedMonth;
-        } else if (selectedYear) {
-            return task.year === selectedYear;
+    const fetchEmployeeData = async (empId) => {
+        try {
+            // Fetch employee data
+            const response = await axios.get('http://localhost:8081/api/employee');
+            const result = response.data;
+            if (result.success === 1 && Array.isArray(result.data)) {
+                // Find employee with Emp_ID equal to empId
+                const filteredEmployee = result.data.find(employee => employee.Emp_ID == empId);
+                if (filteredEmployee) {
+                    setEmployeeName(filteredEmployee.Name);
+                } else {
+                    console.error(`Employee with Emp_ID ${empId} not found.`);
+                }
+            } else {
+                console.error('Failed to fetch employee data');
+            }
+
+            // Fetch tasks for the employee
+            const tasksResponse = await axios.get('http://localhost:8081/api/task');
+            if (tasksResponse.data.success === 1) {
+                const allTasks = tasksResponse.data.data;
+                const employeeTasks = allTasks.filter(task => task.Emp_ID === empId); // Filter tasks for employee with Emp_ID empId
+                setTasks(employeeTasks);
+            } else {
+                console.error('Failed to fetch tasks');
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios.get('http://localhost:8081/getuser', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => {
+                    fetchEmployeeData(res.data.empId);
+                })
+                .catch(err => console.log(err));
+        }
+    }, []); 
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString();
+    };
+
+    // Function to filter tasks by status
+    const filteredTasks = tasks.filter(task => {
+        if (selectedStatus) {
+            return task.Statuss === selectedStatus;
         }
         return true;
     });
 
+    // Function to get card color based on task status
+    const getCardColor = (status) => {
+        switch (status) {
+            case 'Completed':
+                return 'bg-green-200';
+            case 'Not Completed':
+                return 'bg-red-200';
+            case 'In Progress':
+                return 'bg-yellow-200';
+            default:
+                return 'bg-white';
+        }
+    };
+
     return (
         <div className="container px-4 py-8 mx-auto">
-            <h1 className="mb-4 text-2xl font-bold">Task History</h1>
+            <h1 className="mb-4 text-2xl font-bold">Task Prograss</h1>
             <div className="flex flex-col mb-4 md:flex-row md:items-center">
                 <select
-                    className="w-full px-3 py-2 mb-2 mr-0 border border-gray-300 rounded-md md:w-auto md:mb-0 md:mr-2"
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                >
-                    <option value="">All Months</option>
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                </select>
-                <input
-                    type="text"
-                    placeholder="Year"
                     className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md md:w-auto md:mb-0"
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                />
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                    <option value="">All Statuses</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Not Completed">Not Completed</option>
+                </select>
             </div>
-            <div className="overflow-x-auto">
-                <div>
-                    {filteredTaskHistory.map((task) => (
-                        <div key={task.id} className="p-4 mb-4 rounded-lg">
-                            <div className="mb-2 overflow-hidden font-bold overflow-ellipsis">{task.taskTitle}</div>
-                            <div className={`text-white py-1 px-2 rounded ${task.status === 'Completed' ? 'bg-green-500' : task.status === 'In Progress' ? 'bg-yellow-500' : task.status === 'Not Completed' ? 'bg-red-500' : ''}`}>{task.status}</div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1">
+                {filteredTasks.map((task) => (
+                    <div key={task.Task_ID} className="overflow-hidden bg-white">
+                    <div className="p-6 space-y-4">
+                            <h2 className="font-semibold ">{task.Title}</h2>
+                            <p className={`overflow-hidden rounded-lg shadow-md ${getCardColor(task.Statuss)}`}>Status: {task.Statuss}</p>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
 };
 
-export default UserTaskHistory;
+export default UserTask;

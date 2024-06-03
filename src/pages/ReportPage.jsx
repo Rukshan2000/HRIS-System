@@ -7,7 +7,6 @@ import Report from '../components/Report';
 const MyDashboard = () => {
     return (
         <div>
-            <TopNav/>
             <Report/>
 
         </div>
