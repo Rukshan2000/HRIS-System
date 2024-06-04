@@ -35,22 +35,21 @@ const Login = () => {
 
         axios.post('http://localhost:8081/api/users/login', data)
         .then(res => {
+            console.log('login', res.data);
             if (res.data.success==1) {
-                // if (res.data.role === 'admin') {
-                //     localStorage.setItem("token",res.data.token);
-                //     navigate('/dashboard');
-                // } else {
-                //     navigate('/mydashboard');
-                // }
-                localStorage.setItem("token",res.data.token);
-                navigate('/dashboard');
-            } else {
-                alert(res.data.Error); // Notify the user of the specific error
-            }
-            console.log(res);
+                if (res.data.role === 'admin') {
+                    localStorage.setItem("token",res.data.token);
+                    navigate('/dashboard');
+                }else{
+                    localStorage.setItem("token",res.data.token); 
+                    navigate('/mydashboard');
+                }
+            } 
         })
-        .catch(err => console.log(err));
-
+        .catch(err => {
+            console.log(err);
+            alert(err.response.data.message);
+        });
 
 
         // // Check if username and password match

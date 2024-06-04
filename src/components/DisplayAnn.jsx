@@ -1,35 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaBullhorn } from 'react-icons/fa';
 
 const DisplayAnn = () => {
-  // Sample announcement data (you can replace it with actual data from the backend)
-  const announcements = [
-    {
-      id: 1,
-      title: 'Important Announcement',
-      body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere sapien sed arcu elementum commodo.',
-      from: 'Admin'
-    },
-    {
-      id: 2,
-      title: 'Reminder: Team Meeting',
-      body: 'Nam vitae urna vel velit feugiat congue. Sed vestibulum urna at justo vestibulum, id semper nisl malesuada.',
-      from: 'Manager'
-    },
-    // Add more announcement objects here if needed
-  ];
+  const [announcementPreviews, setAnnouncementPreviews] = useState([]);
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    fetchAnnouncements();
+    fetchEmployees();
+  }, []);
+
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/announcement');
+      const announcements = response.data.data;
+      console.log('Fetched Announcements:', announcements);
+      setAnnouncementPreviews(announcements);
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/employee');
+      const employees = response.data.data;
+      console.log('Fetched Employees:', employees);
+      setEmployees(employees);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
+  };
+
+  const getEmployeeName = (empId) => {
+    const employee = employees.find(emp => emp.Emp_ID === empId);
+    return employee ? employee.Name : 'Unknown';
+  };
 
   return (
-    <div className="container px-4 py-8 mx-auto lg:px-8">
-      <h2 className="mb-8 text-3xl font-bold">Announcements</h2>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {announcements.map((announcement) => (
-          <div key={announcement.id} className="p-6 bg-white rounded-lg shadow-md">
-            <h3 className="mb-2 text-xl font-semibold">{announcement.title}</h3>
-            <p className="mb-4 text-gray-700">{announcement.body}</p>
-            <p className="text-gray-500">From: {announcement.from}</p>
+    <div className="relative p-4">
+      {announcementPreviews.map((announcement, index) => (
+        <div key={index} className="w-3/4 p-6 mx-auto mt-6 bg-white border border-gray-300 rounded-lg shadow-md">
+          <div className="flex items-center">
+            <FaBullhorn className="mr-4 text-2xl text-blue-500" />
+            <h3 className="text-xl font-semibold text-blue-700">{announcement.Title}</h3>
           </div>
-        ))}
-      </div>
+          <p className="mt-4 text-gray-700">{announcement.Body}</p>
+          <p className="mt-4 text-gray-500">From: {getEmployeeName(announcement.Emp_ID)}</p>
+        </div>
+      ))}
     </div>
   );
 };

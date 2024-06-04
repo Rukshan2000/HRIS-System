@@ -1,14 +1,13 @@
 // MyDashboard.jsx
 import React from 'react';
 import TopNav from '../components/TopNav';
-import AdProfile from '../components/AdProfile';
+import Report from '../components/Report';
 
 
 const MyDashboard = () => {
     return (
         <div>
-            <TopNav/>
-            <AdProfile/>
+            <Report/>
 
         </div>
     );
